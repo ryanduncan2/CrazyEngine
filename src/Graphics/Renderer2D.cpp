@@ -210,7 +210,7 @@ namespace CrazyEngine
         m_IndexCount += 6;
     }
 
-    void Renderer2D::DrawString(const std::string& str, const Vector2& position, TextureFont* font, float scale)
+    void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale)
     {
         // Sanity Check
 
@@ -242,7 +242,6 @@ namespace CrazyEngine
         // Vertex Definitions
 
         int origin = position.X;
-        Vector4 colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
         for (std::size_t i = 0; i < str.length(); ++i)
         {

@@ -56,7 +56,7 @@ namespace CrazyEngine
         void Draw(const Rectangle& bounds, Texture* texture);
         void Draw(const Rectangle& bounds, const Rectangle& source, Texture* texture);
 
-        void DrawString(const std::string& str, const Vector2& position, TextureFont* font, float scale);
+        void DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale);
     };
 }
 
