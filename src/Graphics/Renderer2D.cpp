@@ -279,7 +279,7 @@ namespace CrazyEngine
 
             Vertex bottomLeft = 
             { 
-                Vector3(origin + glyph.BearingX, position.Y + ((-glyph.BearingY + glyph.Height) * scale), 0.0f), 
+                Vector3(origin + (glyph.BearingX * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), 0.0f), 
                 colour, 
                 Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
                 textureIndex 
