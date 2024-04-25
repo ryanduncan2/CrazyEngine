@@ -18,6 +18,12 @@ namespace CrazyEngine
 
     void Renderer2D::Initialise(const std::uint32_t width, const std::uint32_t height)
     {
+        // Setting Viewport
+
+        m_Viewport = Vector2(width, height);
+
+        // Initialising API
+
         RendererAPI::SetAPI(GraphicsAPI::OPENGL);
         m_API = RendererAPI::Create();
 
@@ -97,6 +103,8 @@ namespace CrazyEngine
 
     void Renderer2D::Resize(const std::uint32_t width, const std::uint32_t height)
     {
+        m_Viewport = Vector2(width, height);
+        
         m_API->SetViewport(0, 0, width, height);
         m_ProjectionMatrix = Matrix4::CreateOrthographic((float)width, (float)height);
     }

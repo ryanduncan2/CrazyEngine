@@ -41,6 +41,8 @@ namespace CrazyEngine
 
         Matrix4 m_ProjectionMatrix;
 
+        Vector2 m_Viewport;
+
     public:
         Renderer2D();
         ~Renderer2D();
@@ -50,6 +52,9 @@ namespace CrazyEngine
 
         void Begin();
         void End();
+
+        inline Vector2 GetViewport() const noexcept { return m_Viewport; }
+        inline Shader* GetShader() const noexcept { return m_Shader; }
 
         void Resize(std::uint32_t width, std::uint32_t height);
 
