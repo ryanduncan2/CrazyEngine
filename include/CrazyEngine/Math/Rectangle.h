@@ -70,7 +70,7 @@ CrazyEngine::Rectangle<T> operator+(CrazyEngine::Rectangle<T>& firstRect, CrazyE
     float X = std::min(firstRect.X, secondRect.X);
     float Y = std::min(firstRect.Y, secondRect.Y);
 
-    FACE_NAMESPACE::Rectangle<T> rect = (X, Y, 
+    CrazyEngine::Rectangle<T> rect = (X, Y, 
                                     std::max(firstRect.GetRight() - X, secondRect.GetRight() - X), 
                                     std::max(firstRect.GetBottom() - Y, secondRect.GetBottom() - Y));
 }

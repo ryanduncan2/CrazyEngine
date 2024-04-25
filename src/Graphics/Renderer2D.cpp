@@ -157,13 +157,13 @@ namespace CrazyEngine
         m_API->DrawIndexed(m_IndexCount);
     }
 
-    void Renderer2D::Draw(const Rectangle& bounds, Texture* texture)
+    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture)
     {
-        Rectangle source(0, 0, texture->GetWidth(), texture->GetHeight());
+        Rectanglef source(0, 0, texture->GetWidth(), texture->GetHeight());
         Draw(bounds, source, texture);
     }
 
-    void Renderer2D::Draw(const Rectangle& bounds, const Rectangle& source, Texture* texture)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture)
     {
         // Sanity Check
 

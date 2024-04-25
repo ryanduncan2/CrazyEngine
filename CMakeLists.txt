@@ -36,7 +36,6 @@ set(SRC_FILES
     src/Math/Vector3.cpp
     src/Math/Vector4.cpp
     src/Math/Matrix4.cpp
-    src/Math/Rectangle.cpp
     src/Math/Duration.cpp
 )
 
