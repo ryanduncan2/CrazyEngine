@@ -119,6 +119,27 @@ namespace CrazyEngine
         m_NextTextureIndex = 0;
     }
 
+    void Renderer2D::Flush()
+    {
+        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
+        {
+            m_TextureSlots[i]->Bind(i);
+        }
+
+        GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
+        m_VertexBuffer->SetData(m_Vertices, size);
+        
+        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
+        m_Shader->Bind();
+
+        m_VertexArray->Bind();
+        m_API->DrawIndexed(m_IndexCount);
+
+        m_IndexCount = 0;
+        m_NextVertex = m_Vertices;
+        m_NextTextureIndex = 0;
+    }
+
     void Renderer2D::End()
     {
         for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
@@ -148,8 +169,7 @@ namespace CrazyEngine
 
         if (m_IndexCount >= MAX_QUADS * 6)
         {
-            End();
-            Begin();
+            Flush();
         }
 
         // Texture Handling
@@ -166,6 +186,11 @@ namespace CrazyEngine
 
         if (textureIndex == -1.0f)
         {
+            if (textureIndex >= MAX_TEXTURE_SLOTS)
+            {
+                Flush();
+            }
+
             textureIndex = (float)m_NextTextureIndex;
             m_TextureSlots[m_NextTextureIndex] = texture;
             m_NextTextureIndex++;

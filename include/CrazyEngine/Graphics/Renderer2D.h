@@ -51,6 +51,7 @@ namespace CrazyEngine
         void Terminate();
 
         void Begin();
+        void Flush();
         void End();
 
         inline Vector2 GetViewport() const noexcept { return m_Viewport; }
