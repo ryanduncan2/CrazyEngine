@@ -597,12 +597,15 @@ namespace CrazyEngine
 
     Matrix4 Matrix4::CreateScale(const float scale) noexcept
     {
-        return Identity;
+        return Matrix4::CreateScale(scale, scale, scale);
     }
 
     Matrix4 Matrix4::CreateScale(const float scaleX, const float scaleY, const float scaleZ) noexcept
     {
-        return Identity;
+        return Matrix4(scaleX, 0, 0, 0,
+                       0, scaleY, 0, 0,
+                       0, 0, scaleZ, 0,
+                       0, 0, 0, 1);
     }
 
     Matrix4 Matrix4::CreateTranslation(const float translationX, const float translationY, const float translationZ) noexcept
