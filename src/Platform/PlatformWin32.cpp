@@ -373,7 +373,7 @@ namespace CrazyEngine
             case WM_MBUTTONUP:
             case WM_RBUTTONUP:
             {
-                bool pressed = (message = WM_LBUTTONDOWN || message == WM_MBUTTONDOWN || message == WM_RBUTTONDOWN);
+                bool pressed = (message == WM_LBUTTONDOWN || message == WM_MBUTTONDOWN || message == WM_RBUTTONDOWN);
                 MouseButton button = MouseButton::MAX_BUTTONS;
 
                 switch (message)

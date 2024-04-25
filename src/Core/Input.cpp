@@ -99,6 +99,10 @@ namespace CrazyEngine
 
     bool Input::IsMouseButtonPressed(MouseButton button)
     {
+        // std::cout << "Querying Mouse Pressed: " << std::endl;
+        // std::cout << " - Previous State: " << m_PreviousMouseButtonsState[button] << std::endl;
+        // std::cout << " - Current State: " << m_CurrentMouseButtonsState[button] << std::endl;
+
         return m_PreviousMouseButtonsState[button] == false && m_CurrentMouseButtonsState[button] == true;
     }
 

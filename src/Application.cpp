@@ -32,9 +32,10 @@ namespace CrazyEngine
 
         while (!m_ShouldClose)
         {
+            m_Input.Update();
+
             m_Platform.PumpMessages();
             m_Clock.Update(m_Platform);
-            m_Input.Update();
 
             Update();
             Draw();
