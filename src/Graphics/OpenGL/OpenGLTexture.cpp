@@ -12,6 +12,18 @@ namespace CrazyEngine
     {
         std::uint8_t* data = stbi_load(filePath, (int*)&m_Width, (int*)&m_Height, (int*)&m_ChannelCount, 0);
         
+        // glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+        // glGenTextures(1, &m_Handle);
+        // glBindTexture(GL_TEXTURE_2D, m_Handle);
+
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        // glGenerateMipmap(GL_TEXTURE_2D);
+
+        // glBindTexture(GL_TEXTURE_2D, 0);
+
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
         glGenTextures(1, &m_Handle);
         glBindTexture(GL_TEXTURE_2D, m_Handle);
@@ -19,7 +31,15 @@ namespace CrazyEngine
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        if (m_ChannelCount == 4)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        }
+        else
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        }
+        
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -27,6 +47,7 @@ namespace CrazyEngine
         stbi_image_free(data);
     }
 
+    // this one has been altered for fonts/greyscale.
     OpenGLTexture::OpenGLTexture(std::uint32_t width, std::uint32_t height, std::uint8_t* data) : m_Width(width), m_Height(height)
     {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

@@ -4,12 +4,12 @@
 
 namespace CrazyEngine
 {
-    constexpr float Calculator::DegreesToRadians(float angle)
+    float Calculator::DegreesToRadians(float angle)
     {
         return angle * Pi / 180.0f;
     }
 
-    constexpr float Calculator::RadiansToDegrees(float angle)
+    float Calculator::RadiansToDegrees(float angle)
     {
         return angle * 180.0f / Pi;
     }
@@ -36,7 +36,7 @@ namespace CrazyEngine
         return (1.0f - t) * a + t * b;
     }
 
-    constexpr float Calculator::Clamp(const float value, const float lower, const float upper)
+    float Calculator::Clamp(const float value, const float lower, const float upper)
     {
         if (value < lower)
         {

@@ -4,32 +4,37 @@
 
 namespace CrazyEngine
 {
-    Duration::Duration() : Duration(0) 
+    Duration::Duration() : Duration(0.0) 
     { 
     }
 
-    Duration::Duration(std::uint32_t milliseconds) : m_Milliseconds(milliseconds)
+    Duration::Duration(double milliseconds) : m_Milliseconds(milliseconds)
     {
     }
 
-    void Duration::SetValue(std::uint32_t milliseconds) noexcept
+    void Duration::SetValue(double milliseconds) noexcept
     {
         m_Milliseconds = milliseconds;
     }
 
-    float Duration::TotalSeconds() const noexcept
+    double Duration::TotalMilliseconds() const noexcept
     {
-        return (float)m_Milliseconds / 1000.0f;
+        return m_Milliseconds;
     }
 
-    float Duration::TotalMinutes() const noexcept
+    double Duration::TotalSeconds() const noexcept
     {
-        return (float)m_Milliseconds / 60000.0f;
+        return m_Milliseconds / 1000.0;
     }
 
-    float Duration::TotalHours() const noexcept
+    double Duration::TotalMinutes() const noexcept
     {
-        return (float)m_Milliseconds / 3600000.0f;
+        return m_Milliseconds / 60000.0;
+    }
+
+    double Duration::TotalHours() const noexcept
+    {
+        return m_Milliseconds / 3600000.0;
     }
 
     std::uint32_t Duration::Milliseconds() const noexcept
@@ -39,17 +44,17 @@ namespace CrazyEngine
 
     std::uint32_t Duration::Seconds() const noexcept
     {
-        return std::floorf(TotalSeconds());
+        return std::floor(TotalSeconds());
     }
 
     std::uint32_t Duration::Minutes() const noexcept
     {
-        return std::floorf(TotalMinutes());
+        return std::floor(TotalMinutes());
     }
 
     std::uint32_t Duration::Hours() const noexcept
     {
-        return std::floorf(TotalHours());
+        return std::floor(TotalHours());
     }
 
     void Duration::operator+=(const Duration& duration) noexcept
@@ -65,25 +70,25 @@ namespace CrazyEngine
 
 CrazyEngine::Duration operator+(const CrazyEngine::Duration& firstDuration, const CrazyEngine::Duration& secondDuration) noexcept
 {
-    return CrazyEngine::Duration(firstDuration.Milliseconds() + secondDuration.Milliseconds());
+    return CrazyEngine::Duration(firstDuration.TotalMilliseconds() + secondDuration.TotalMilliseconds());
 }
 
 CrazyEngine::Duration operator-(const CrazyEngine::Duration& firstDuration, const CrazyEngine::Duration& secondDuration) noexcept
 {
-    return CrazyEngine::Duration(firstDuration.Milliseconds() - secondDuration.Milliseconds());
+    return CrazyEngine::Duration(firstDuration.TotalMilliseconds() - secondDuration.TotalMilliseconds());
 }
 
 CrazyEngine::Duration operator==(const CrazyEngine::Duration& firstDuration, const CrazyEngine::Duration& secondDuration) noexcept
 {
-    return firstDuration.Milliseconds() == secondDuration.Milliseconds();
+    return firstDuration.TotalMilliseconds() == secondDuration.TotalMilliseconds();
 }
 
 CrazyEngine::Duration operator!=(const CrazyEngine::Duration& firstDuration, const CrazyEngine::Duration& secondDuration) noexcept
 {
-    return firstDuration.Milliseconds() != secondDuration.Milliseconds();
+    return firstDuration.TotalMilliseconds() != secondDuration.TotalMilliseconds();
 }
 
 std::ostream& operator<<(std::ostream& os, const CrazyEngine::Duration& duration) noexcept
 {
-    return os << duration.Milliseconds();
+    return os << duration.TotalMilliseconds();
 }

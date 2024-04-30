@@ -10,17 +10,18 @@ namespace CrazyEngine
     {
     private:
         
-        std::uint32_t m_Milliseconds;
+        double m_Milliseconds;
 
     public:
         Duration();
-        Duration(std::uint32_t milliseconds);
+        Duration(double milliseconds);
 
-        void SetValue(std::uint32_t milliseconds) noexcept;
+        void SetValue(double milliseconds) noexcept;
 
-        float TotalSeconds() const noexcept;
-        float TotalMinutes() const noexcept;
-        float TotalHours() const noexcept;
+        double TotalMilliseconds() const noexcept;
+        double TotalSeconds() const noexcept;
+        double TotalMinutes() const noexcept;
+        double TotalHours() const noexcept;
 
         std::uint32_t Milliseconds() const noexcept;
         std::uint32_t Seconds() const noexcept;

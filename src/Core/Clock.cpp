@@ -16,10 +16,9 @@ namespace CrazyEngine
 
     void Clock::Update(const Platform& platform) noexcept
     {
-        Duration currentTime = Duration(std::roundf(platform.GetAbsoluteTime() / 1000.0f));
+        m_TotalGameTime = Duration(platform.GetAbsoluteTime());
 
-        m_ElapsedGameTime = currentTime - m_LastTime;
-        m_TotalGameTime = currentTime;
-        m_LastTime = currentTime;
+        m_ElapsedGameTime = m_TotalGameTime - m_LastTime;
+        m_LastTime = m_TotalGameTime;
     }
 }

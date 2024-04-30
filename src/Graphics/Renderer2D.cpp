@@ -243,6 +243,86 @@ namespace CrazyEngine
         m_IndexCount += 6;
     }
 
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation)
+    {
+        // Sanity Check
+
+        if (m_IndexCount >= MAX_QUADS * 6)
+        {
+            Flush();
+        }
+
+        // Texture Handling
+
+        float textureIndex = -1.0f;
+        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
+        {
+            if (m_TextureSlots[i]->GetHandle() == texture->GetHandle())
+            {
+                textureIndex = (float)i;
+                break;
+            }
+        }
+
+        if (textureIndex == -1.0f)
+        {
+            if (textureIndex >= MAX_TEXTURE_SLOTS)
+            {
+                Flush();
+            }
+
+            textureIndex = (float)m_NextTextureIndex;
+            m_TextureSlots[m_NextTextureIndex] = texture;
+            m_NextTextureIndex++;
+        }
+
+        // Vertex Definitions
+
+        Vector4 colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        Vertex topLeft = 
+        { 
+            Vector3(bounds.X, bounds.Y, 0.0f), 
+            colour, 
+            Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
+            textureIndex 
+        };
+        *m_NextVertex = topLeft;
+        m_NextVertex++;
+
+        Vertex topRight = 
+        { 
+            Vector3(bounds.X + bounds.Width, bounds.Y, 0.0f), 
+            colour, 
+            Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
+            textureIndex 
+        };
+        *m_NextVertex = topRight;
+        m_NextVertex++;
+
+        Vertex bottomRight = 
+        { 
+            Vector3(bounds.X + bounds.Width, bounds.Y + bounds.Height, 0.0f), 
+            colour, 
+            Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
+            textureIndex 
+        };
+        *m_NextVertex = bottomRight;
+        m_NextVertex++;
+
+        Vertex bottomLeft = 
+        { 
+            Vector3(bounds.X, bounds.Y + bounds.Height, 0.0f), 
+            colour, 
+            Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
+            textureIndex 
+        };
+        *m_NextVertex = bottomLeft;
+        m_NextVertex++;
+
+        m_IndexCount += 6;
+    }
+
     void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale)
     {
         // Sanity Check

@@ -46,7 +46,7 @@ namespace CrazyEngine
         std::optional<Callbacks> Callbacks;
 
         // Clock Objects
-        double ClockFrequency;
+        LARGE_INTEGER ClockFrequency;
         LARGE_INTEGER StartTime;
     };  
 
@@ -261,9 +261,7 @@ namespace CrazyEngine
 
         // Setting Up Clock
 
-        LARGE_INTEGER frequency;
-        QueryPerformanceFrequency(&frequency);
-        state->ClockFrequency = 1.0f / (double)frequency.QuadPart;
+        QueryPerformanceFrequency(&(state->ClockFrequency));
         QueryPerformanceCounter(&(state->StartTime));
     }
 
@@ -306,7 +304,10 @@ namespace CrazyEngine
 
         LARGE_INTEGER now;
         QueryPerformanceCounter(&now);
-        return (double)now.QuadPart * state->ClockFrequency;
+
+        double elapsedMilliseconds = ((now.QuadPart - state->StartTime.QuadPart) * 1000.0) / state->ClockFrequency.QuadPart;
+
+        return elapsedMilliseconds;
     }
 
     void Platform::Sleep(std::uint64_t milliseconds)
@@ -372,22 +373,28 @@ namespace CrazyEngine
             case WM_LBUTTONUP:
             case WM_MBUTTONUP:
             case WM_RBUTTONUP:
+            case WM_LBUTTONDBLCLK:
+            case WM_RBUTTONDBLCLK:
+            case WM_MBUTTONDBLCLK:
             {
-                bool pressed = (message == WM_LBUTTONDOWN || message == WM_MBUTTONDOWN || message == WM_RBUTTONDOWN);
+                bool pressed = (message == WM_LBUTTONDOWN || message == WM_MBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_LBUTTONDBLCLK || message == WM_RBUTTONDBLCLK || message == WM_MBUTTONDBLCLK);
                 MouseButton button = MouseButton::MAX_BUTTONS;
 
                 switch (message)
                 {
                     case WM_LBUTTONDOWN:
                     case WM_LBUTTONUP:
+                    case WM_LBUTTONDBLCLK:
                         button = MouseButton::MOUSE_LEFT;
                         break;
                     case WM_RBUTTONDOWN:
                     case WM_RBUTTONUP:
+                    case WM_RBUTTONDBLCLK:
                         button = MouseButton::MOUSE_RIGHT;
                         break;
                     case WM_MBUTTONDOWN:
                     case WM_MBUTTONUP:
+                    case WM_MBUTTONDBLCLK:
                         button = MouseButton::MOUSE_MIDDLE;
                         break;
                 }

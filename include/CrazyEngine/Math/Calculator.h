@@ -23,12 +23,12 @@ namespace CrazyEngine
         static constexpr float Root2 = 1.4142135f;
         static constexpr double Root2Double = 1.414213562373095;
 
-        static constexpr float DegreesToRadians(float);
-        static constexpr float RadiansToDegrees(float);
-        static float WrapAngle(float);
-        static float WrapAngle180(float);
-        static float Lerp(float, float, float);
-        static constexpr float Clamp(const float, const float, const float);
+        static float DegreesToRadians(float degrees);
+        static float RadiansToDegrees(float radians);
+        static float WrapAngle(float angle);
+        static float WrapAngle180(float angle);
+        static float Lerp(float a, float b, float t);
+        static float Clamp(const float value, const float lower, const float upper);
     };
 }
 

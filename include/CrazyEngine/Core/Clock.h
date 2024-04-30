@@ -21,8 +21,8 @@ namespace CrazyEngine
 
         void Update(const Platform& platform) noexcept;
         
-        inline float GetElapsedGameTime() const noexcept { m_ElapsedGameTime; }
-        inline float GetTotalGameTime() const noexcept { m_TotalGameTime; }
+        inline Duration GetElapsedGameTime() const noexcept { return m_ElapsedGameTime; }
+        inline Duration GetTotalGameTime() const noexcept { return m_TotalGameTime; }
     };
 }
 
