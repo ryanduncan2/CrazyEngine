@@ -280,9 +280,14 @@ namespace CrazyEngine
 
         Vector4 colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
+        float sin = std::sinf(rotation);
+        float cos = std::cosf(rotation);
+
+        float x = -bounds.Width / 2.0f;
+        float y = -bounds.Height / 2.0f;
         Vertex topLeft = 
         { 
-            Vector3(bounds.X, bounds.Y, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
             textureIndex 
@@ -290,9 +295,10 @@ namespace CrazyEngine
         *m_NextVertex = topLeft;
         m_NextVertex++;
 
+        x = bounds.Width / 2.0f;
         Vertex topRight = 
         { 
-            Vector3(bounds.X + bounds.Width, bounds.Y, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
             textureIndex 
@@ -300,9 +306,10 @@ namespace CrazyEngine
         *m_NextVertex = topRight;
         m_NextVertex++;
 
+        y = bounds.Height / 2.0f;
         Vertex bottomRight = 
         { 
-            Vector3(bounds.X + bounds.Width, bounds.Y + bounds.Height, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
             textureIndex 
@@ -310,9 +317,10 @@ namespace CrazyEngine
         *m_NextVertex = bottomRight;
         m_NextVertex++;
 
+        x = -bounds.Width / 2.0f;
         Vertex bottomLeft = 
         { 
-            Vector3(bounds.X, bounds.Y + bounds.Height, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
             textureIndex 
