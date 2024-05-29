@@ -13,6 +13,7 @@ namespace CrazyEngine
         Vector4 Colour;
         Vector2 TextureCoords;
         float TextureIndex;
+        int Flags;
     };
 }
 

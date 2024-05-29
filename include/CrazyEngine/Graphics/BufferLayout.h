@@ -53,7 +53,7 @@ namespace CrazyEngine
 
         void AddElement(ShaderDataType type);
         inline std::vector<BufferElement>& GetElements() { return m_Elements; }
-        inline std::uint32_t GetSize() { return m_Size; }
+        inline std::uint32_t GetSize() const noexcept { return m_Size; }
     };
 }
 

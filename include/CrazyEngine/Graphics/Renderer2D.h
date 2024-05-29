@@ -11,6 +11,7 @@
 #include "CrazyEngine/Graphics/VertexArray.h"
 #include "CrazyEngine/Graphics/Texture.h"
 #include "CrazyEngine/Graphics/TextureFont.h"
+#include "CrazyEngine/Graphics/RendererState.h"
 
 #include "CrazyEngine/Math/Rectangle.h"
 #include "CrazyEngine/Math/Matrix4.h"
@@ -26,6 +27,8 @@ namespace CrazyEngine
 
         RendererAPI* m_API;
 
+        Shader* m_Shader;
+
         VertexArray* m_VertexArray;
         VertexBuffer* m_VertexBuffer;
         IndexBuffer* m_IndexBuffer;
@@ -37,7 +40,7 @@ namespace CrazyEngine
         Vertex* m_NextVertex;
         std::uint32_t m_IndexCount;
 
-        Shader* m_Shader;
+        // RendererState* m_RendererState;
 
         Matrix4 m_ProjectionMatrix;
 
@@ -55,15 +58,19 @@ namespace CrazyEngine
         void End();
 
         inline Vector2 GetViewport() const noexcept { return m_Viewport; }
+        inline void SetShader(Shader* shader) noexcept { m_Shader = shader; }
         inline Shader* GetShader() const noexcept { return m_Shader; }
+
+        // inline RendererState* GetRendererState() const noexcept { return m_RendererState; }
+        // void SetRendererState(RendererState* state);
 
         void Resize(std::uint32_t width, std::uint32_t height);
 
-        void Draw(const Rectanglef& bounds, Texture* texture);
-        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture);
-        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation);
+        void Draw(const Rectanglef& bounds, Texture* texture, int flags = 0);
+        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, int flags = 0);
+        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, int flags = 0);
 
-        void DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale);
+        void DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, int flags = 0);
     };
 }
 

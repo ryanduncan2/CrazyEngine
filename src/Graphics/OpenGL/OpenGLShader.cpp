@@ -8,7 +8,7 @@
 
 namespace CrazyEngine
 {
-    OpenGLShader::OpenGLShader(const char* vertexFilePath, const char* fragmentFilePath)
+    OpenGLShader::OpenGLShader(const char* vertexFilePath, const char* fragmentFilePath, int textureSlots)
     {
         std::string vertexCode, fragCode;
         std::ifstream vertexFile, fragFile;
@@ -16,7 +16,6 @@ namespace CrazyEngine
         try
         {
             // Reading Vertex Shader
-
             vertexFile.open(vertexFilePath);
             std::stringstream vertexStream;
             vertexStream << vertexFile.rdbuf();
@@ -24,7 +23,6 @@ namespace CrazyEngine
             vertexCode = vertexStream.str();
 
             // Reading Fragment Shader
-
             fragFile.open(fragmentFilePath);
             std::stringstream fragStream;
             fragStream << fragFile.rdbuf();
@@ -91,18 +89,22 @@ namespace CrazyEngine
         glDeleteShader(vertexShaderHandle);
         glDeleteShader(fragShaderHandle);
 
-        // // Setting Sampler Array
+        // Setting Texture Samplers
 
-        // glUseProgram(m_ShaderID);
+        if (textureSlots == 0)
+        {
+            return;
+        }
 
-        // auto loc = glGetUniformLocation(m_ShaderID, "u_Textures");
-        // int samplers[32];
-        // for (int i = 0; i < 32; ++i)
-        // {
-        //     samplers[i] = i;
-        // }
-
-        // glUniform1iv(loc, 32, samplers);
+        int* samplers = new int[textureSlots];
+        for (int i = 0; i < textureSlots; ++i)
+        {
+            samplers[i] = i;
+        }
+        
+        Bind();
+        SetIntArray("u_Textures", textureSlots, samplers);
+        Unbind();
     }
 
     OpenGLShader::~OpenGLShader()
@@ -138,6 +140,11 @@ namespace CrazyEngine
     void OpenGLShader::SetFloat(const char* name, float value)
     {
         glUniform1f(glGetUniformLocation(m_ShaderID, name), value);
+    }
+
+    void OpenGLShader::SetFloat3(const char* name, float value1, float value2, float value3)
+    {
+        glUniform3f(glGetUniformLocation(m_ShaderID, name), value1, value2, value3);
     }
 
     void OpenGLShader::SetMatrix4(const char* name, const Matrix4& matrix)

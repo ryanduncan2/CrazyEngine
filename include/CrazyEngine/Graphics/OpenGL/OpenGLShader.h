@@ -13,7 +13,7 @@ namespace CrazyEngine
 
     public:
 
-        OpenGLShader(const char* vertexFilePath, const char* fragmentFilePath);
+        OpenGLShader(const char* vertexFilePath, const char* fragmentFilePath, int textureSlots = 0);
         ~OpenGLShader();
 
         void Bind() const override;
@@ -23,6 +23,7 @@ namespace CrazyEngine
         void SetInt(const char* name, int value) override;
         void SetIntArray(const char* name, const int count, int* value) override;
         void SetFloat(const char* name, float value) override;
+        void SetFloat3(const char* name, float value1, float value2, float value3) override;
         void SetMatrix4(const char* name, const Matrix4& matrix) override;
     };
 }

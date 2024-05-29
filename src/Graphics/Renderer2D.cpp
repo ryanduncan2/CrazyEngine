@@ -30,20 +30,6 @@ namespace CrazyEngine
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Shader Setup
-
-        m_Shader = Shader::Create("../../shaders/shader.vert", "../../shaders/shader.frag");
-
-        int* samplers = new int[MAX_TEXTURE_SLOTS];
-        for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i)
-        {
-            samplers[i] = i;
-        }
-        
-        m_Shader->Bind();
-        m_Shader->SetIntArray("u_Textures", MAX_TEXTURE_SLOTS, samplers);
-        m_Shader->Unbind();
-
         // Local Buffer Creation
 
         m_Vertices = new Vertex[MAX_QUADS * 4];
@@ -59,6 +45,7 @@ namespace CrazyEngine
         layout.AddElement(ShaderDataType::FLOAT4);
         layout.AddElement(ShaderDataType::FLOAT2);
         layout.AddElement(ShaderDataType::FLOAT);
+        layout.AddElement(ShaderDataType::INT);
 
         m_VertexBuffer = VertexBuffer::Create(layout.GetSize() * 4 * MAX_QUADS);
         m_VertexBuffer->SetLayout(layout);
@@ -95,10 +82,10 @@ namespace CrazyEngine
         delete[] m_Vertices;
 
         delete m_API;
+        // delete m_RendererState; // maybe let client handle this
         delete m_VertexArray;
         delete m_VertexBuffer;
         delete m_IndexBuffer;
-        delete m_Shader;
     }
 
     void Renderer2D::Resize(const std::uint32_t width, const std::uint32_t height)
@@ -128,7 +115,7 @@ namespace CrazyEngine
 
         GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
         m_VertexBuffer->SetData(m_Vertices, size);
-        
+
         m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
         m_Shader->Bind();
 
@@ -140,6 +127,7 @@ namespace CrazyEngine
         m_NextTextureIndex = 0;
     }
 
+    // TODO: Optimise by incorporating Flush().
     void Renderer2D::End()
     {
         for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
@@ -149,7 +137,7 @@ namespace CrazyEngine
 
         GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
         m_VertexBuffer->SetData(m_Vertices, size);
-        
+
         m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
         m_Shader->Bind();
 
@@ -157,13 +145,13 @@ namespace CrazyEngine
         m_API->DrawIndexed(m_IndexCount);
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture)
+    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, int flags)
     {
         Rectanglef source(0, 0, texture->GetWidth(), texture->GetHeight());
-        Draw(bounds, source, texture);
+        Draw(bounds, source, texture, flags);
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, int flags)
     {
         // Sanity Check
 
@@ -186,7 +174,7 @@ namespace CrazyEngine
 
         if (textureIndex == -1.0f)
         {
-            if (textureIndex >= MAX_TEXTURE_SLOTS)
+            if (m_NextTextureIndex >= MAX_TEXTURE_SLOTS)
             {
                 Flush();
             }
@@ -205,7 +193,8 @@ namespace CrazyEngine
             Vector3(bounds.X, bounds.Y, 0.0f), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags
         };
         *m_NextVertex = topLeft;
         m_NextVertex++;
@@ -215,7 +204,8 @@ namespace CrazyEngine
             Vector3(bounds.X + bounds.Width, bounds.Y, 0.0f), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags
         };
         *m_NextVertex = topRight;
         m_NextVertex++;
@@ -225,7 +215,8 @@ namespace CrazyEngine
             Vector3(bounds.X + bounds.Width, bounds.Y + bounds.Height, 0.0f), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags 
         };
         *m_NextVertex = bottomRight;
         m_NextVertex++;
@@ -235,7 +226,8 @@ namespace CrazyEngine
             Vector3(bounds.X, bounds.Y + bounds.Height, 0.0f), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags 
         };
         *m_NextVertex = bottomLeft;
         m_NextVertex++;
@@ -243,7 +235,7 @@ namespace CrazyEngine
         m_IndexCount += 6;
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, int flags)
     {
         // Sanity Check
 
@@ -266,7 +258,7 @@ namespace CrazyEngine
 
         if (textureIndex == -1.0f)
         {
-            if (textureIndex >= MAX_TEXTURE_SLOTS)
+            if (m_NextTextureIndex >= MAX_TEXTURE_SLOTS)
             {
                 Flush();
             }
@@ -290,7 +282,8 @@ namespace CrazyEngine
             Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags 
         };
         *m_NextVertex = topLeft;
         m_NextVertex++;
@@ -301,7 +294,8 @@ namespace CrazyEngine
             Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags 
         };
         *m_NextVertex = topRight;
         m_NextVertex++;
@@ -312,7 +306,8 @@ namespace CrazyEngine
             Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags 
         };
         *m_NextVertex = bottomRight;
         m_NextVertex++;
@@ -323,7 +318,8 @@ namespace CrazyEngine
             Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex 
+            textureIndex,
+            flags 
         };
         *m_NextVertex = bottomLeft;
         m_NextVertex++;
@@ -331,14 +327,13 @@ namespace CrazyEngine
         m_IndexCount += 6;
     }
 
-    void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale)
+    void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, int flags)
     {
         // Sanity Check
 
         if (m_IndexCount >= MAX_QUADS * 6)
         {
-            End();
-            Begin();
+            Flush();
         }
 
         // Texture Handling
@@ -355,6 +350,11 @@ namespace CrazyEngine
 
         if (textureIndex == -1.0f)
         {
+            if (m_NextTextureIndex >= MAX_TEXTURE_SLOTS)
+            {
+                Flush();
+            }
+
             textureIndex = (float)m_NextTextureIndex;
             m_TextureSlots[m_NextTextureIndex] = font->GetAtlas();
             m_NextTextureIndex++;
@@ -373,7 +373,8 @@ namespace CrazyEngine
                 Vector3(origin + (glyph.BearingX * scale), position.Y - (glyph.BearingY * scale), 0.0f), 
                 colour, 
                 Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)glyph.TextureY / font->GetAtlas()->GetHeight()), 
-                textureIndex 
+                textureIndex,
+                flags 
             };
             *m_NextVertex = topLeft;
             m_NextVertex++;
@@ -383,7 +384,8 @@ namespace CrazyEngine
                 Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y - (glyph.BearingY * scale), 0.0f), 
                 colour, 
                 Vector2((float)(glyph.TextureX + glyph.Width) / font->GetAtlas()->GetWidth(), (float)glyph.TextureY / font->GetAtlas()->GetHeight()), 
-                textureIndex 
+                textureIndex,
+                flags 
             };
             *m_NextVertex = topRight;
             m_NextVertex++;
@@ -393,7 +395,8 @@ namespace CrazyEngine
                 Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), 0.0f), 
                 colour, 
                 Vector2((float)(glyph.TextureX + glyph.Width) / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
-                textureIndex 
+                textureIndex,
+                flags 
             };
             *m_NextVertex = bottomRight;
             m_NextVertex++;
@@ -403,7 +406,8 @@ namespace CrazyEngine
                 Vector3(origin + (glyph.BearingX * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), 0.0f), 
                 colour, 
                 Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
-                textureIndex 
+                textureIndex,
+                flags 
             };
             *m_NextVertex = bottomLeft;
             m_NextVertex++;

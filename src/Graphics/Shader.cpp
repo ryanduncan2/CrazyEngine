@@ -17,4 +17,17 @@ namespace CrazyEngine
 
         return nullptr;
     }
+
+    Shader* Shader::Create(const char* vertexFilePath, const char* fragmentFilePath, int textureSlots)
+    {
+        switch (RendererAPI::GetAPI())
+        {
+            case GraphicsAPI::NONE: return nullptr;
+            case GraphicsAPI::OPENGL: return new OpenGLShader(vertexFilePath, fragmentFilePath, textureSlots);
+            case GraphicsAPI::VULKAN: return nullptr;
+            default: return nullptr;
+        }
+
+        return nullptr;
+    }
 }
