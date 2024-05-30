@@ -43,6 +43,7 @@ namespace CrazyEngine
             m_Platform.SwapBuffers();
         }
 
+        Terminate();
         m_Platform.Terminate();
     }
 }

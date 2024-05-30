@@ -3,75 +3,116 @@
 #include <fstream>
 #include <iostream>
 
+#include "CrazyEngine/Math/Calculator.h"
+
 namespace CrazyEngine
 {
     TextureFont* TextureFont::Load(const char* filePath)
     {
-        std::ifstream file(filePath, std::ios::binary | std::ios::ate);
-
-        std::size_t size = file.tellg();
-        std::uint8_t* buffer = new std::uint8_t[size];
-        file.seekg(0, std::ios::beg);
-        file.read((char*)buffer, size);
-        file.close();
-
+        std::ifstream file(filePath, std::ios::binary | std::ios::beg);
         TextureFont* font = new TextureFont();
 
         // Header
 
-        std::size_t index = 0;
-        memcpy(&size, buffer + index, sizeof(std::size_t));
-        index += sizeof(std::size_t);
-
-        char* header = new char[size + 1];
-        memcpy(header, buffer + index, size);
-        index += size * sizeof(char);
-        header[size] = '\0';
+        std::size_t size = 0;
+        file.read((char*)&size, sizeof(size_t));
         
+        char* header = new char[size + 1];
+        file.read(header, size);
+        header[size] = '\0';
+
         if (strcmp(header, FONT_FILE_HEADER))
         {
-            std::cout << "Incompatible file detected." << std::endl;
+            std::cout << "Incompatible font file detected." << std::endl;
             return nullptr;
         }
 
         // Glyph Count
 
-        std::size_t glyphCount;
-        memcpy(&glyphCount, buffer + index, sizeof(std::size_t));
-        index += sizeof(std::size_t);
+        file.read((char*)&size, sizeof(std::size_t));
+        font->m_Glyphs.resize(size, { });
 
-        font->m_Glyphs.resize(glyphCount, { });
+        // Glyphs
 
-        for (std::size_t i = 0; i < glyphCount; ++i)
+        for (std::size_t i = 0; i < size; ++i)
         {
-            memcpy(&font->m_Glyphs[i].ASCIICode, buffer + index, sizeof(std::uint32_t));
-            index += sizeof(std::uint32_t);
-            memcpy(&font->m_Glyphs[i].Width, buffer + index, sizeof(std::uint32_t));
-            index += sizeof(std::uint32_t);
-            memcpy(&font->m_Glyphs[i].Height, buffer + index, sizeof(std::uint32_t));
-            index += sizeof(std::uint32_t);
-            memcpy(&font->m_Glyphs[i].BearingX, buffer + index, sizeof(std::int32_t));
-            index += sizeof(std::int32_t);
-            memcpy(&font->m_Glyphs[i].BearingY, buffer + index, sizeof(std::int32_t));
-            index += sizeof(std::int32_t);
-            memcpy(&font->m_Glyphs[i].Advance, buffer + index, sizeof(std::int32_t));
-            index += sizeof(std::int32_t);
-            memcpy(&font->m_Glyphs[i].TextureX, buffer + index, sizeof(std::size_t));
-            index += sizeof(std::size_t);
-            memcpy(&font->m_Glyphs[i].TextureY, buffer + index, sizeof(std::size_t));
-            index += sizeof(std::size_t);
+            file.read((char*)&font->m_Glyphs[i].ASCIICode, sizeof(std::uint32_t));
+            file.read((char*)&font->m_Glyphs[i].Width, sizeof(std::uint32_t));
+            file.read((char*)&font->m_Glyphs[i].Height, sizeof(std::uint32_t));
+            file.read((char*)&font->m_Glyphs[i].BearingX, sizeof(std::int32_t));
+            file.read((char*)&font->m_Glyphs[i].BearingY, sizeof(std::int32_t));
+            file.read((char*)&font->m_Glyphs[i].Advance, sizeof(std::int32_t));
+            file.read((char*)&font->m_Glyphs[i].TextureX, sizeof(std::size_t));
+            file.read((char*)&font->m_Glyphs[i].TextureY, sizeof(std::size_t));
         }
 
         // Texture Atlas
 
-        std::size_t atlasWidth, atlasHeight;
-        memcpy(&atlasWidth, buffer + index, sizeof(std::size_t));
-        index += sizeof(std::size_t);
-        memcpy(&atlasHeight, buffer + index, sizeof(std::size_t));
-        index += sizeof(std::size_t);
+        std::size_t atlasWidth = 0;
+        std::size_t atlasHeight = 0;
 
-        font->m_GlyphAtlas = Texture::Create(atlasWidth, atlasHeight, buffer + index);
+        file.read((char*)&atlasWidth, sizeof(std::size_t));
+        file.read((char*)&atlasHeight, sizeof(std::size_t));
+
+        std::uint8_t* atlasData = new std::uint8_t[atlasWidth * atlasHeight * sizeof(std::uint8_t)];
+        file.read((char*)atlasData, atlasWidth * atlasHeight * sizeof(std::uint8_t));
+        file.close();
+
+        font->m_GlyphAtlas = Texture::Create(atlasWidth, atlasHeight, atlasData);
 
         return font;
+    }
+
+    TextureFont::~TextureFont()
+    {
+        delete m_GlyphAtlas;
+    }
+
+    Vector2 TextureFont::MeasureString(const char* str, float scale) const noexcept
+    {
+        std::uint32_t maxY = 0;
+        std::uint32_t minY = 0;
+        Vector2 dimensions;
+
+        std::size_t length = strlen(str);
+
+        if (length == 0)
+        {
+            return dimensions;
+        }
+
+        // First Character
+
+        Glyph firstGlyph = GetGlyph(str[0]);
+        dimensions.X = firstGlyph.BearingX < 0 ? firstGlyph.Width + std::abs(firstGlyph.BearingX) : firstGlyph.Width;
+        maxY = firstGlyph.BearingY;
+        minY = firstGlyph.Height - firstGlyph.BearingY;
+
+        // Middle Characters
+
+        for (std::size_t i = 1; i < length - 1; ++i)
+        {
+            Glyph glyph = GetGlyph(str[i]);
+            dimensions.X += glyph.Advance;
+
+            maxY = Calculator::Max(maxY, glyph.BearingY);
+            minY = Calculator::Max(minY, glyph.Height - glyph.BearingY);
+        }
+
+        // Last Character
+
+        if (length >= 2)
+        {   
+            Glyph lastGlyph = GetGlyph(str[length - 1]);
+            dimensions.X += lastGlyph.BearingX + lastGlyph.Width;
+
+            maxY = Calculator::Max(maxY, lastGlyph.BearingY);
+            minY = Calculator::Max(minY, lastGlyph.Height - lastGlyph.BearingY);
+        }
+
+        dimensions.Y = maxY + minY;
+        dimensions *= scale;
+
+        return dimensions;
     }
 }

@@ -270,6 +270,7 @@ namespace CrazyEngine
         Win32InternalState* state = (Win32InternalState*)m_InternalState;
 
         ReleaseDC(state->HWND, state->HDC);
+        wglMakeCurrent(NULL, NULL);
         wglDeleteContext(state->HGLRC);
 
         if (state->HWND != nullptr)

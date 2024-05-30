@@ -1,6 +1,8 @@
 #ifndef CRAZYENGINE_MATH_CALCULATOR_H_
 #define CRAZYENGINE_MATH_CALCULATOR_H_
 
+#include <cstdint>
+
 namespace CrazyEngine
 {
     class Calculator
@@ -29,6 +31,11 @@ namespace CrazyEngine
         static float WrapAngle180(float angle);
         static float Lerp(float a, float b, float t);
         static float Clamp(const float value, const float lower, const float upper);
+
+        static std::uint32_t Max(const std::uint32_t a, const std::uint32_t b);
+        static std::uint32_t Min(const std::uint32_t a, const std::uint32_t b);
+        static float Maxf(const float a, const float b);
+        static float Minf(const float a, const float b);
     };
 }
 

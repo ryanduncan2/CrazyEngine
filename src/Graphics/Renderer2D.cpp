@@ -79,13 +79,11 @@ namespace CrazyEngine
 
     void Renderer2D::Terminate()
     {
-        delete[] m_Vertices;
-
         delete m_API;
-        // delete m_RendererState; // maybe let client handle this
         delete m_VertexArray;
         delete m_VertexBuffer;
         delete m_IndexBuffer;
+        delete[] m_Vertices;
     }
 
     void Renderer2D::Resize(const std::uint32_t width, const std::uint32_t height)
@@ -143,6 +141,10 @@ namespace CrazyEngine
 
         m_VertexArray->Bind();
         m_API->DrawIndexed(m_IndexCount);
+
+        m_IndexCount = 0;
+        m_NextVertex = m_Vertices;
+        m_NextTextureIndex = 0;
     }
 
     void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, int flags)
@@ -155,7 +157,7 @@ namespace CrazyEngine
     {
         // Sanity Check
 
-        if (m_IndexCount >= MAX_QUADS * 6)
+        if (m_IndexCount >= MAX_QUADS * 6 || (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices >= MAX_QUADS * 4)
         {
             Flush();
         }
@@ -239,7 +241,7 @@ namespace CrazyEngine
     {
         // Sanity Check
 
-        if (m_IndexCount >= MAX_QUADS * 6)
+        if (m_IndexCount >= MAX_QUADS * 6 || (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices >= MAX_QUADS * 4)
         {
             Flush();
         }
@@ -331,7 +333,7 @@ namespace CrazyEngine
     {
         // Sanity Check
 
-        if (m_IndexCount >= MAX_QUADS * 6)
+        if (m_IndexCount >= MAX_QUADS * 6 || (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices >= MAX_QUADS * 4)
         {
             Flush();
         }
@@ -367,6 +369,13 @@ namespace CrazyEngine
         for (std::size_t i = 0; i < str.length(); ++i)
         {
             Glyph glyph = font->GetGlyph(str[i]);
+
+            if (str[i] == ' ')
+            {
+                origin += glyph.Advance * scale;
+
+                continue;
+            }
 
             Vertex topLeft = 
             { 

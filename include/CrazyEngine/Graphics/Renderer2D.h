@@ -11,7 +11,6 @@
 #include "CrazyEngine/Graphics/VertexArray.h"
 #include "CrazyEngine/Graphics/Texture.h"
 #include "CrazyEngine/Graphics/TextureFont.h"
-#include "CrazyEngine/Graphics/RendererState.h"
 
 #include "CrazyEngine/Math/Rectangle.h"
 #include "CrazyEngine/Math/Matrix4.h"
@@ -40,8 +39,6 @@ namespace CrazyEngine
         Vertex* m_NextVertex;
         std::uint32_t m_IndexCount;
 
-        // RendererState* m_RendererState;
-
         Matrix4 m_ProjectionMatrix;
 
         Vector2 m_Viewport;
@@ -60,9 +57,6 @@ namespace CrazyEngine
         inline Vector2 GetViewport() const noexcept { return m_Viewport; }
         inline void SetShader(Shader* shader) noexcept { m_Shader = shader; }
         inline Shader* GetShader() const noexcept { return m_Shader; }
-
-        // inline RendererState* GetRendererState() const noexcept { return m_RendererState; }
-        // void SetRendererState(RendererState* state);
 
         void Resize(std::uint32_t width, std::uint32_t height);
 

@@ -24,7 +24,6 @@ set(SRC_FILES
     src/Graphics/VertexArray.cpp
     src/Graphics/BufferLayout.cpp
     src/Graphics/TextureFont.cpp
-    src/Graphics/RendererState.cpp
 
     src/Graphics/OpenGL/OpenGLBuffers.cpp
     src/Graphics/OpenGL/OpenGLRendererAPI.cpp

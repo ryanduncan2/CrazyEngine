@@ -49,4 +49,44 @@ namespace CrazyEngine
 
         return value;
     }
+
+    std::uint32_t Calculator::Max(const std::uint32_t a, const std::uint32_t b)
+    {
+        if (a <= b)
+        {
+            return b;
+        }
+
+        return a;
+    }
+
+    std::uint32_t Calculator::Min(const std::uint32_t a, const std::uint32_t b)
+    {
+        if (a <= b)
+        {
+            return a;
+        }
+
+        return b;
+    }
+
+    float Calculator::Maxf(const float a, const float b)
+    {
+        if (a <= b)
+        {
+            return b;
+        }
+
+        return a;
+    }
+
+    float Calculator::Minf(const float a, const float b)
+    {
+        if (a <= b)
+        {
+            return a;
+        }
+
+        return b;
+    }
 }

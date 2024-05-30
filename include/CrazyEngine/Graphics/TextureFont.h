@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "CrazyEngine/Graphics/Texture.h"
+#include "CrazyEngine/Math/Vector2.h"
 
 namespace CrazyEngine
 {
@@ -30,12 +31,14 @@ namespace CrazyEngine
 
     public:
         TextureFont() { }
-        ~TextureFont() { }
+        ~TextureFont();
 
         static TextureFont* Load(const char* filePath);
 
         inline Texture* GetAtlas() { return m_GlyphAtlas; }
-        inline Glyph GetGlyph(char ch) { return m_Glyphs[(int)ch - 33]; }
+        inline Glyph GetGlyph(char ch) const noexcept { return m_Glyphs[(int)ch - 32]; }
+
+        Vector2 MeasureString(const char* str, float scale) const noexcept;
     };
 }
 
