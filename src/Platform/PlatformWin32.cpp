@@ -357,15 +357,17 @@ namespace CrazyEngine
             } break;
             case WM_MOUSEMOVE:
             {
+                SetFocus(hwnd);
                 ((Win32InternalState*)GetWindowLongPtrA(hwnd, GWLP_USERDATA))->Callbacks.value().MousePositionCallback(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
             } break;
-            case WM_MOUSEHWHEEL:
+            case WM_MOUSEWHEEL:
             {
                 std::int32_t delta = GET_WHEEL_DELTA_WPARAM(wParam);
                 if (delta != 0)
                 {
                     delta = (delta < 0) ? -1 : 1;
+                    ((Win32InternalState*)GetWindowLongPtrA(hwnd, GWLP_USERDATA))->Callbacks.value().MouseWheelCallback(delta);
                 }
             } break;
             case WM_LBUTTONDOWN:

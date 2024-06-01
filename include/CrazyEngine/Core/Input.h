@@ -165,6 +165,7 @@ namespace CrazyEngine
         Vector2 m_PreviousMousePosition;
         bool m_CurrentMouseButtonsState[3];
         bool m_PreviousMouseButtonsState[3];
+        int m_MouseWheelDelta;
 
     public:
 
@@ -178,6 +179,7 @@ namespace CrazyEngine
         void ProcessKeyboardInput(Key key, bool pressed);
         void ProcessMouseButtonInput(MouseButton button, bool pressed);
         void ProcessMouseMovement(int mouseX, int mouseY);
+        void ProcessMouseWheel(int delta);
 
         // Keyboard Querying Functions
 
@@ -198,6 +200,8 @@ namespace CrazyEngine
 
         bool IsMouseButtonPressed(MouseButton button);
         bool IsMouseButtonReleased(MouseButton button);
+
+        int GetMouseWheelDelta();
 
         Vector2 GetMousePosition();
         Vector2 GetPreviousMousePosition();

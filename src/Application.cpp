@@ -16,6 +16,7 @@ namespace CrazyEngine
         callbacks.KeyCallback = std::bind(&Input::ProcessKeyboardInput, &m_Input, std::placeholders::_1, std::placeholders::_2);
         callbacks.MouseButtonCallback = std::bind(&Input::ProcessMouseButtonInput, &m_Input, std::placeholders::_1, std::placeholders::_2);
         callbacks.MousePositionCallback = std::bind(&Input::ProcessMouseMovement, &m_Input, std::placeholders::_1, std::placeholders::_2);
+        callbacks.MouseWheelCallback = std::bind(&Input::ProcessMouseWheel, &m_Input, std::placeholders::_1);
         callbacks.WindowResizeCallback = std::bind(&Application::OnResize, this, std::placeholders::_1, std::placeholders::_2);
         callbacks.WindowCloseCallback = std::bind(&Application::OnClose, this, std::placeholders::_1);
         m_Platform.SetCallbacks(callbacks);

@@ -15,6 +15,7 @@ namespace CrazyEngine
         std::function<void(Key, bool)> KeyCallback;
         std::function<void(MouseButton, bool)> MouseButtonCallback;
         std::function<void(int, int)> MousePositionCallback;
+        std::function<void(int)> MouseWheelCallback;
         std::function<void(int, int)> WindowResizeCallback;
         std::function<void(bool)> WindowCloseCallback;
     };

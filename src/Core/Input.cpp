@@ -24,6 +24,8 @@ namespace CrazyEngine
 
     void Input::Update()
     {
+        m_MouseWheelDelta = 0;
+
         memcpy(m_PreviousKeyboardState, m_CurrentKeyboardState, sizeof(m_CurrentKeyboardState));
         memcpy(m_PreviousMouseButtonsState, m_CurrentMouseButtonsState, sizeof(m_CurrentMouseButtonsState));
     }
@@ -41,6 +43,12 @@ namespace CrazyEngine
     void Input::ProcessMouseMovement(int mouseX, int mouseY)
     {
         m_CurrentMousePosition = Vector2(mouseX, mouseY);
+    }
+
+    void Input::ProcessMouseWheel(int delta)
+    {
+        // std::cout << "Processing mouse wheel: " << delta << std::endl;
+        m_MouseWheelDelta = delta;
     }
 
     // Keyboard Querying Functions
@@ -109,6 +117,11 @@ namespace CrazyEngine
     bool Input::IsMouseButtonReleased(MouseButton button)
     {
         return m_PreviousMouseButtonsState[button] == true && m_CurrentMouseButtonsState[button] == false;
+    }
+
+    int Input::GetMouseWheelDelta()
+    {
+        return m_MouseWheelDelta;
     }
 
     Vector2 Input::GetMousePosition()
