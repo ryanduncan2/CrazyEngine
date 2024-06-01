@@ -36,6 +36,8 @@ namespace CrazyEngine
         static std::uint32_t Min(const std::uint32_t a, const std::uint32_t b);
         static float Maxf(const float a, const float b);
         static float Minf(const float a, const float b);
+
+        std::uint32_t Mod(std::int32_t a, std::uint32_t m);
     };
 }
 

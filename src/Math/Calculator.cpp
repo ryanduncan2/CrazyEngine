@@ -89,4 +89,10 @@ namespace CrazyEngine
 
         return b;
     }
+
+    std::uint32_t Calculator::Mod(std::int32_t a, std::uint32_t m)
+    {
+        std::int32_t result = a % m;
+        return result >= 0 ? result : result + m;
+    }
 }
