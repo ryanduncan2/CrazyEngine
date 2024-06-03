@@ -146,6 +146,8 @@ namespace CrazyEngine
         GRAVE = 0xC0,
     };
 
+    Key& operator++(Key& key);
+
     enum MouseButton
     {
         MOUSE_LEFT,

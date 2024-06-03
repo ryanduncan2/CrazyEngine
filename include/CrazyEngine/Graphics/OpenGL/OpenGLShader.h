@@ -24,6 +24,9 @@ namespace CrazyEngine
         void SetIntArray(const char* name, const int count, int* value) override;
         void SetFloat(const char* name, float value) override;
         void SetFloat3(const char* name, float value1, float value2, float value3) override;
+        void SetFloatArray(const char* name, const int count, float* value) override;
+        void SetFloat3Array(const char* name, const int count, CrazyEngine::Vector3* value) override;
+        void SetFloat2Array(const char* name, const int count, CrazyEngine::Vector2* value) override;
         void SetMatrix4(const char* name, const Matrix4& matrix) override;
     };
 }

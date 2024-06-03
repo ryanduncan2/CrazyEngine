@@ -60,11 +60,11 @@ namespace CrazyEngine
 
         void Resize(std::uint32_t width, std::uint32_t height);
 
-        void Draw(const Rectanglef& bounds, Texture* texture, int flags = 0);
-        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, int flags = 0);
-        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, int flags = 0);
+        void Draw(const Rectanglef& bounds, Texture* texture, float depth = 0.0f, int flags = 0);
+        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float depth = 0.0f, int flags = 0);
+        void Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, float depth = 0.0f, int flags = 0);
 
-        void DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, int flags = 0);
+        void DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, float depth = 0.0f, int flags = 0);
     };
 }
 

@@ -30,6 +30,12 @@ namespace CrazyEngine
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // glEnable(GL_DEPTH_TEST);
+        // glDepthFunc(GL_LEQUAL);
+
+        // glEnable(GL_ALPHA_TEST);
+        // glAlphaFunc(GL_GREATER, 0.0f);
+
         // Local Buffer Creation
 
         m_Vertices = new Vertex[MAX_QUADS * 4];
@@ -114,8 +120,8 @@ namespace CrazyEngine
         GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
         m_VertexBuffer->SetData(m_Vertices, size);
 
-        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
         m_Shader->Bind();
+        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
 
         m_VertexArray->Bind();
         m_API->DrawIndexed(m_IndexCount);
@@ -136,8 +142,8 @@ namespace CrazyEngine
         GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
         m_VertexBuffer->SetData(m_Vertices, size);
 
-        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
         m_Shader->Bind();
+        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
 
         m_VertexArray->Bind();
         m_API->DrawIndexed(m_IndexCount);
@@ -147,13 +153,13 @@ namespace CrazyEngine
         m_NextTextureIndex = 0;
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, int flags)
+    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, float depth, int flags)
     {
         Rectanglef source(0, 0, texture->GetWidth(), texture->GetHeight());
-        Draw(bounds, source, texture, flags);
+        Draw(bounds, source, texture, depth, flags);
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, int flags)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float depth, int flags)
     {
         // Sanity Check
 
@@ -192,7 +198,7 @@ namespace CrazyEngine
 
         Vertex topLeft = 
         { 
-            Vector3(bounds.X, bounds.Y, 0.0f), 
+            Vector3(bounds.X, bounds.Y, depth), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
             textureIndex,
@@ -203,7 +209,7 @@ namespace CrazyEngine
 
         Vertex topRight = 
         { 
-            Vector3(bounds.X + bounds.Width, bounds.Y, 0.0f), 
+            Vector3(bounds.X + bounds.Width, bounds.Y, depth), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
             textureIndex,
@@ -214,7 +220,7 @@ namespace CrazyEngine
 
         Vertex bottomRight = 
         { 
-            Vector3(bounds.X + bounds.Width, bounds.Y + bounds.Height, 0.0f), 
+            Vector3(bounds.X + bounds.Width, bounds.Y + bounds.Height, depth), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
             textureIndex,
@@ -225,7 +231,7 @@ namespace CrazyEngine
 
         Vertex bottomLeft = 
         { 
-            Vector3(bounds.X, bounds.Y + bounds.Height, 0.0f), 
+            Vector3(bounds.X, bounds.Y + bounds.Height, depth), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
             textureIndex,
@@ -237,7 +243,7 @@ namespace CrazyEngine
         m_IndexCount += 6;
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, int flags)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, float depth, int flags)
     {
         // Sanity Check
 
@@ -281,7 +287,7 @@ namespace CrazyEngine
         float y = -bounds.Height / 2.0f;
         Vertex topLeft = 
         { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
             textureIndex,
@@ -293,7 +299,7 @@ namespace CrazyEngine
         x = bounds.Width / 2.0f;
         Vertex topRight = 
         { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
             textureIndex,
@@ -305,7 +311,7 @@ namespace CrazyEngine
         y = bounds.Height / 2.0f;
         Vertex bottomRight = 
         { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
             colour, 
             Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
             textureIndex,
@@ -317,7 +323,7 @@ namespace CrazyEngine
         x = -bounds.Width / 2.0f;
         Vertex bottomLeft = 
         { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, 0.0f), 
+            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
             colour, 
             Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
             textureIndex,
@@ -329,7 +335,7 @@ namespace CrazyEngine
         m_IndexCount += 6;
     }
 
-    void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, int flags)
+    void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, float depth, int flags)
     {
         // Sanity Check
 
@@ -379,7 +385,7 @@ namespace CrazyEngine
 
             Vertex topLeft = 
             { 
-                Vector3(origin + (glyph.BearingX * scale), position.Y - (glyph.BearingY * scale), 0.0f), 
+                Vector3(origin + (glyph.BearingX * scale), position.Y - (glyph.BearingY * scale), depth), 
                 colour, 
                 Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)glyph.TextureY / font->GetAtlas()->GetHeight()), 
                 textureIndex,
@@ -390,7 +396,7 @@ namespace CrazyEngine
 
             Vertex topRight = 
             { 
-                Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y - (glyph.BearingY * scale), 0.0f), 
+                Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y - (glyph.BearingY * scale), depth), 
                 colour, 
                 Vector2((float)(glyph.TextureX + glyph.Width) / font->GetAtlas()->GetWidth(), (float)glyph.TextureY / font->GetAtlas()->GetHeight()), 
                 textureIndex,
@@ -401,7 +407,7 @@ namespace CrazyEngine
 
             Vertex bottomRight = 
             { 
-                Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), 0.0f), 
+                Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), depth), 
                 colour, 
                 Vector2((float)(glyph.TextureX + glyph.Width) / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
                 textureIndex,
@@ -412,7 +418,7 @@ namespace CrazyEngine
 
             Vertex bottomLeft = 
             { 
-                Vector3(origin + (glyph.BearingX * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), 0.0f), 
+                Vector3(origin + (glyph.BearingX * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), depth), 
                 colour, 
                 Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
                 textureIndex,

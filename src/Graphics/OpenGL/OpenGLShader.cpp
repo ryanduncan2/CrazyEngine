@@ -147,6 +147,21 @@ namespace CrazyEngine
         glUniform3f(glGetUniformLocation(m_ShaderID, name), value1, value2, value3);
     }
 
+    void OpenGLShader::SetFloat2Array(const char* name, const int count, CrazyEngine::Vector2* value)
+    {
+        glUniform2fv(glGetUniformLocation(m_ShaderID, name), count, (float*)value);
+    }
+
+    void OpenGLShader::SetFloat3Array(const char* name, const int count, CrazyEngine::Vector3* value)
+    {
+        glUniform3fv(glGetUniformLocation(m_ShaderID, name), count, (float*)value);
+    }
+
+    void OpenGLShader::SetFloatArray(const char* name, const int count, float* value)
+    {
+        glUniform1fv(glGetUniformLocation(m_ShaderID, name), count, value);
+    }
+
     void OpenGLShader::SetMatrix4(const char* name, const Matrix4& matrix)
     {
         glUniformMatrix4fv(glGetUniformLocation(m_ShaderID, name), 1, GL_FALSE, (GLfloat*)&matrix);

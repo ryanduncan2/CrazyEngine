@@ -2,6 +2,8 @@
 
 #include "CrazyEngine/Math/Calculator.h"
 
+#include <iostream>
+
 namespace CrazyEngine
 {
     float Calculator::DegreesToRadians(float angle)
@@ -90,7 +92,7 @@ namespace CrazyEngine
         return b;
     }
 
-    std::uint32_t Calculator::Mod(std::int32_t a, std::uint32_t m)
+    std::uint32_t Calculator::Mod(std::int32_t a, std::int32_t m)
     {
         std::int32_t result = a % m;
         return result >= 0 ? result : result + m;

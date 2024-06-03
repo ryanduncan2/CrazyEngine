@@ -2,6 +2,16 @@
 
 namespace CrazyEngine
 {
+    // Key
+
+    Key& operator++(Key& key)
+    {
+        key = static_cast<Key>(key + 1);
+        return key;
+    }
+
+    // Input
+
     Input::Input()
     {
     }
@@ -47,7 +57,6 @@ namespace CrazyEngine
 
     void Input::ProcessMouseWheel(int delta)
     {
-        // std::cout << "Processing mouse wheel: " << delta << std::endl;
         m_MouseWheelDelta = delta;
     }
 

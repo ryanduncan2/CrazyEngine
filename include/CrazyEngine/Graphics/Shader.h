@@ -19,6 +19,9 @@ namespace CrazyEngine
         virtual void SetIntArray(const char* name, const int count, int* value) = 0;
         virtual void SetFloat(const char* name, float value) = 0;
         virtual void SetFloat3(const char* name, float value1, float value2, float value3) = 0;
+        virtual void SetFloatArray(const char* name, const int count, float* value) = 0;
+        virtual void SetFloat2Array(const char* name, const int count, CrazyEngine::Vector2* value) = 0;
+        virtual void SetFloat3Array(const char* name, const int count, CrazyEngine::Vector3* value) = 0;
         virtual void SetMatrix4(const char* name, const Matrix4& matrix) = 0;
 
         static Shader* Create(const char* vertexFilePath, const char* fragmentFilePath);
