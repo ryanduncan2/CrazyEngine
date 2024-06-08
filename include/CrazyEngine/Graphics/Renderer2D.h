@@ -11,6 +11,7 @@
 #include "CrazyEngine/Graphics/VertexArray.h"
 #include "CrazyEngine/Graphics/Texture.h"
 #include "CrazyEngine/Graphics/TextureFont.h"
+#include "CrazyEngine/Graphics/RenderItem.h"
 
 #include "CrazyEngine/Math/Rectangle.h"
 #include "CrazyEngine/Math/Matrix4.h"
@@ -27,20 +28,16 @@ namespace CrazyEngine
         RendererAPI* m_API;
 
         Shader* m_Shader;
-
         VertexArray* m_VertexArray;
         VertexBuffer* m_VertexBuffer;
         IndexBuffer* m_IndexBuffer;
 
         std::array<Texture*, MAX_TEXTURE_SLOTS> m_TextureSlots;
-        std::uint32_t m_NextTextureIndex;
 
-        Vertex* m_Vertices;
-        Vertex* m_NextVertex;
-        std::uint32_t m_IndexCount;
+        Vertex* m_VertexData;
+        std::vector<RenderItem> m_RenderItems;
 
         Matrix4 m_ProjectionMatrix;
-
         Vector2 m_Viewport;
 
     public:

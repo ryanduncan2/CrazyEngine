@@ -16,6 +16,8 @@ set(SRC_FILES
 
     src/Platform/PlatformWin32.cpp
 
+    src/Audio/Audio.cpp
+
     src/Graphics/Shader.cpp
     src/Graphics/Renderer2D.cpp
     src/Graphics/Texture.cpp
@@ -24,6 +26,7 @@ set(SRC_FILES
     src/Graphics/VertexArray.cpp
     src/Graphics/BufferLayout.cpp
     src/Graphics/TextureFont.cpp
+    src/Graphics/RenderItem.cpp
 
     src/Graphics/OpenGL/OpenGLBuffers.cpp
     src/Graphics/OpenGL/OpenGLRendererAPI.cpp
@@ -41,4 +44,4 @@ set(SRC_FILES
 
 add_library(CrazyEngine STATIC ${SRC_FILES})
 target_include_directories(CrazyEngine PRIVATE include "${OPENGL_INCLUDE_DIR}")
-target_link_libraries(CrazyEngine PRIVATE "${OPENGL_LIBRARIES}")
+target_link_libraries(CrazyEngine PRIVATE "${OPENGL_LIBRARIES}" ole32)

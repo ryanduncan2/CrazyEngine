@@ -2,6 +2,7 @@
 #define CRAZYENGINE_MATH_RECTANGLE_H_
 
 #include <iostream>
+#include <cmath>
 
 #include "CrazyEngine/Math/Vector2.h"
 
@@ -46,10 +47,10 @@ namespace CrazyEngine
 
         void operator+=(const Rectangle<T>& rect) noexcept
         {
-            X = std::min(X, rect.X);
-            Y = std::min(Y, rect.Y);
-            Width = std::max(GetRight() - X, rect.GetRight() - X);
-            Height = std::max(GetBottom() - Y, rect.GetBottom() - Y);
+            X = min(X, rect.X);
+            Y = min(Y, rect.Y);
+            Width = max(GetRight() - X, rect.GetRight() - X);
+            Height = max(GetBottom() - Y, rect.GetBottom() - Y);
         }
     };
 
@@ -67,12 +68,14 @@ std::ostream& operator<<(std::ostream& os, const CrazyEngine::Rectangle<T>& rect
 template<class T>
 CrazyEngine::Rectangle<T> operator+(CrazyEngine::Rectangle<T>& firstRect, CrazyEngine::Rectangle<T>& secondRect) noexcept
 {
-    float X = std::min(firstRect.X, secondRect.X);
-    float Y = std::min(firstRect.Y, secondRect.Y);
+    float X = min(firstRect.X, secondRect.X);
+    float Y = min(firstRect.Y, secondRect.Y);
 
     CrazyEngine::Rectangle<T> rect = (X, Y, 
-                                    std::max(firstRect.GetRight() - X, secondRect.GetRight() - X), 
-                                    std::max(firstRect.GetBottom() - Y, secondRect.GetBottom() - Y));
+                                    max(firstRect.GetRight() - X, secondRect.GetRight() - X), 
+                                    max(firstRect.GetBottom() - Y, secondRect.GetBottom() - Y));
+
+    return rect;
 }
 
 template<class T>

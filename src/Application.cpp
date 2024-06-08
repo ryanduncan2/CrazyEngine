@@ -37,6 +37,8 @@ namespace CrazyEngine
 
             m_Platform.PumpMessages();
             m_Clock.Update(m_Platform);
+            
+            m_Audio.Update(m_Clock);
 
             Update();
             Draw();

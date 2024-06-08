@@ -2,9 +2,11 @@
 
 #include <Vendor/glad/glad.h>
 #include <iostream>
+#include <algorithm>
 
 #include "CrazyEngine/Graphics/RendererAPI.h"
 #include "CrazyEngine/Graphics/Shader.h"
+#include "CrazyEngine/Math/Calculator.h"
 
 namespace CrazyEngine
 {
@@ -30,19 +32,9 @@ namespace CrazyEngine
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // glEnable(GL_DEPTH_TEST);
-        // glDepthFunc(GL_LEQUAL);
-
-        // glEnable(GL_ALPHA_TEST);
-        // glAlphaFunc(GL_GREATER, 0.0f);
-
         // Local Buffer Creation
 
-        m_Vertices = new Vertex[MAX_QUADS * 4];
-        m_NextVertex = m_Vertices;
-        m_IndexCount = 0;
-
-        m_NextTextureIndex = 0;
+        m_VertexData = new Vertex[MAX_QUADS * 4];
 
         // Buffer Creation
 
@@ -89,7 +81,7 @@ namespace CrazyEngine
         delete m_VertexArray;
         delete m_VertexBuffer;
         delete m_IndexBuffer;
-        delete[] m_Vertices;
+        delete[] m_VertexData;
     }
 
     void Renderer2D::Resize(const std::uint32_t width, const std::uint32_t height)
@@ -103,54 +95,123 @@ namespace CrazyEngine
     void Renderer2D::Begin()
     {
         m_API->Clear();
-
-        m_IndexCount = 0;
-        m_NextVertex = m_Vertices;
-
-        m_NextTextureIndex = 0;
     }
 
     void Renderer2D::Flush()
     {
-        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
-        {
-            m_TextureSlots[i]->Bind(i);
-        }
-
-        GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
-        m_VertexBuffer->SetData(m_Vertices, size);
-
-        m_Shader->Bind();
-        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
-
-        m_VertexArray->Bind();
-        m_API->DrawIndexed(m_IndexCount);
-
-        m_IndexCount = 0;
-        m_NextVertex = m_Vertices;
-        m_NextTextureIndex = 0;
     }
 
-    // TODO: Optimise by incorporating Flush().
     void Renderer2D::End()
     {
-        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
+        // Sort by Depth
+
+        std::ranges::sort(m_RenderItems, [](const RenderItem& a, const RenderItem& b)
         {
-            m_TextureSlots[i]->Bind(i);
+            return a.GetDepth() < b.GetDepth();
+        });
+
+        // Draw all Batches
+
+        Vertex* nextVertex = m_VertexData;
+        
+        std::uint32_t itemCount = 0;
+        std::uint32_t indexCount = 0;
+        std::uint32_t nextTextureIndex = 0;
+
+        for (std::size_t i = 0; i < m_RenderItems.size(); ++i)
+        {
+            if (i != 0 && itemCount % MAX_QUADS == 0)
+            {
+                // Flushing Data
+
+                for (std::uint32_t i = 0; i < nextTextureIndex; ++i)
+                {
+                    m_TextureSlots[i]->Bind(i);
+                }
+
+                m_VertexBuffer->SetData(m_VertexData, itemCount * sizeof(Vertex) * 4);
+                m_Shader->Bind();
+                m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
+                m_VertexArray->Bind();
+                m_API->DrawIndexed(indexCount);
+
+                indexCount = 0;
+                itemCount = 0;
+                nextVertex = m_VertexData;
+                nextTextureIndex = 0;
+            }
+
+            RenderItem item = m_RenderItems[i];
+
+            // Handle Textures
+
+            float textureIndex = -1.0f;
+            for (std::uint32_t i = 0; i < nextTextureIndex; ++i)
+            {
+                if (m_TextureSlots[i]->GetHandle() == item.GetTexture()->GetHandle())
+                {
+                    textureIndex = (float)i;
+                    break;
+                }
+            }
+
+            if (textureIndex == -1.0f)
+            {
+                if (nextTextureIndex >= MAX_TEXTURE_SLOTS)
+                {
+                    // Flushing Data
+
+                    for (std::uint32_t i = 0; i < nextTextureIndex; ++i)
+                    {
+                        m_TextureSlots[i]->Bind(i);
+                    }
+
+                    m_VertexBuffer->SetData(m_VertexData, itemCount * sizeof(Vertex) * 4);
+                    m_Shader->Bind();
+                    m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
+                    m_VertexArray->Bind();
+                    m_API->DrawIndexed(indexCount);
+
+                    indexCount = 0;
+                    itemCount = 0;
+                    nextVertex = m_VertexData;
+                    nextTextureIndex = 0;
+
+                    i--;
+                    continue;
+                }
+
+                textureIndex = (float)nextTextureIndex;
+                m_TextureSlots[nextTextureIndex] = item.GetTexture();
+                nextTextureIndex++;
+            }
+
+            // Write Vertices
+
+            m_RenderItems[i].WriteVertices(nextVertex, textureIndex);
+
+            indexCount += 6;
+            itemCount++;
+            nextVertex += 4;
         }
 
-        GLsizeiptr size = (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices;
-        m_VertexBuffer->SetData(m_Vertices, size);
+        // Flushing Final Data
 
-        m_Shader->Bind();
-        m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
+        if (indexCount != 0)
+        {
+            for (std::uint32_t i = 0; i < nextTextureIndex; ++i)
+            {
+                m_TextureSlots[i]->Bind(i);
+            }
 
-        m_VertexArray->Bind();
-        m_API->DrawIndexed(m_IndexCount);
+            m_VertexBuffer->SetData(m_VertexData, itemCount * sizeof(Vertex) * 4);
+            m_Shader->Bind();
+            m_Shader->SetMatrix4("u_Projection", m_ProjectionMatrix);
+            m_VertexArray->Bind();
+            m_API->DrawIndexed(indexCount);
+        }
 
-        m_IndexCount = 0;
-        m_NextVertex = m_Vertices;
-        m_NextTextureIndex = 0;
+        m_RenderItems.clear();
     }
 
     void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, float depth, int flags)
@@ -161,217 +222,36 @@ namespace CrazyEngine
 
     void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float depth, int flags)
     {
-        // Sanity Check
-
-        if (m_IndexCount >= MAX_QUADS * 6 || (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices >= MAX_QUADS * 4)
+        if (m_RenderItems.size() >= MAX_QUADS)
         {
             Flush();
         }
 
-        // Texture Handling
-
-        float textureIndex = -1.0f;
-        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
-        {
-            if (m_TextureSlots[i]->GetHandle() == texture->GetHandle())
-            {
-                textureIndex = (float)i;
-                break;
-            }
-        }
-
-        if (textureIndex == -1.0f)
-        {
-            if (m_NextTextureIndex >= MAX_TEXTURE_SLOTS)
-            {
-                Flush();
-            }
-
-            textureIndex = (float)m_NextTextureIndex;
-            m_TextureSlots[m_NextTextureIndex] = texture;
-            m_NextTextureIndex++;
-        }
-
-        // Vertex Definitions
-
-        Vector4 colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-        Vertex topLeft = 
-        { 
-            Vector3(bounds.X, bounds.Y, depth), 
-            colour, 
-            Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex,
-            flags
-        };
-        *m_NextVertex = topLeft;
-        m_NextVertex++;
-
-        Vertex topRight = 
-        { 
-            Vector3(bounds.X + bounds.Width, bounds.Y, depth), 
-            colour, 
-            Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex,
-            flags
-        };
-        *m_NextVertex = topRight;
-        m_NextVertex++;
-
-        Vertex bottomRight = 
-        { 
-            Vector3(bounds.X + bounds.Width, bounds.Y + bounds.Height, depth), 
-            colour, 
-            Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex,
-            flags 
-        };
-        *m_NextVertex = bottomRight;
-        m_NextVertex++;
-
-        Vertex bottomLeft = 
-        { 
-            Vector3(bounds.X, bounds.Y + bounds.Height, depth), 
-            colour, 
-            Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex,
-            flags 
-        };
-        *m_NextVertex = bottomLeft;
-        m_NextVertex++;
-
-        m_IndexCount += 6;
+        m_RenderItems.push_back(RenderItem(bounds, source, texture, Vector4(1.0f, 1.0f, 1.0f, 1.0f), depth, 0.0f, flags));
     }
 
     void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, float depth, int flags)
     {
-        // Sanity Check
-
-        if (m_IndexCount >= MAX_QUADS * 6 || (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices >= MAX_QUADS * 4)
+        if (m_RenderItems.size() >= MAX_QUADS)
         {
             Flush();
         }
 
-        // Texture Handling
-
-        float textureIndex = -1.0f;
-        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
-        {
-            if (m_TextureSlots[i]->GetHandle() == texture->GetHandle())
-            {
-                textureIndex = (float)i;
-                break;
-            }
-        }
-
-        if (textureIndex == -1.0f)
-        {
-            if (m_NextTextureIndex >= MAX_TEXTURE_SLOTS)
-            {
-                Flush();
-            }
-
-            textureIndex = (float)m_NextTextureIndex;
-            m_TextureSlots[m_NextTextureIndex] = texture;
-            m_NextTextureIndex++;
-        }
-
-        // Vertex Definitions
-
-        Vector4 colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-        float sin = std::sinf(rotation);
-        float cos = std::cosf(rotation);
-
-        float x = -bounds.Width / 2.0f;
-        float y = -bounds.Height / 2.0f;
-        Vertex topLeft = 
-        { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
-            colour, 
-            Vector2((float)source.X / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex,
-            flags 
-        };
-        *m_NextVertex = topLeft;
-        m_NextVertex++;
-
-        x = bounds.Width / 2.0f;
-        Vertex topRight = 
-        { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
-            colour, 
-            Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)source.Y / texture->GetHeight()), 
-            textureIndex,
-            flags 
-        };
-        *m_NextVertex = topRight;
-        m_NextVertex++;
-
-        y = bounds.Height / 2.0f;
-        Vertex bottomRight = 
-        { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
-            colour, 
-            Vector2((float)(source.X + source.Width) / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex,
-            flags 
-        };
-        *m_NextVertex = bottomRight;
-        m_NextVertex++;
-
-        x = -bounds.Width / 2.0f;
-        Vertex bottomLeft = 
-        { 
-            Vector3((x * cos) - (y * sin) + bounds.X, (x * sin) + (y * cos) + bounds.Y, depth), 
-            colour, 
-            Vector2((float)source.X / texture->GetWidth(), (float)(source.Y + source.Height) / texture->GetHeight()), 
-            textureIndex,
-            flags 
-        };
-        *m_NextVertex = bottomLeft;
-        m_NextVertex++;
-
-        m_IndexCount += 6;
+        m_RenderItems.push_back(RenderItem(bounds, source, texture, Vector4(1.0f, 1.0f, 1.0f, 1.0f), depth, rotation, flags));
     }
 
     void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, float depth, int flags)
     {
         // Sanity Check
 
-        if (m_IndexCount >= MAX_QUADS * 6 || (std::uint8_t*)m_NextVertex - (std::uint8_t*)m_Vertices >= MAX_QUADS * 4)
+        if (m_RenderItems.size() >= MAX_QUADS)
         {
             Flush();
         }
 
-        // Texture Handling
-
-        float textureIndex = -1.0f;
-        for (std::uint32_t i = 0; i < m_NextTextureIndex; ++i)
-        {
-            if (m_TextureSlots[i]->GetHandle() == font->GetAtlas()->GetHandle())
-            {
-                textureIndex = (float)i;
-                break;
-            }
-        }
-
-        if (textureIndex == -1.0f)
-        {
-            if (m_NextTextureIndex >= MAX_TEXTURE_SLOTS)
-            {
-                Flush();
-            }
-
-            textureIndex = (float)m_NextTextureIndex;
-            m_TextureSlots[m_NextTextureIndex] = font->GetAtlas();
-            m_NextTextureIndex++;
-        }
-
-        // Vertex Definitions
+        // Drawing Glyphs
 
         int origin = position.X;
-
         for (std::size_t i = 0; i < str.length(); ++i)
         {
             Glyph glyph = font->GetGlyph(str[i]);
@@ -383,51 +263,10 @@ namespace CrazyEngine
                 continue;
             }
 
-            Vertex topLeft = 
-            { 
-                Vector3(origin + (glyph.BearingX * scale), position.Y - (glyph.BearingY * scale), depth), 
-                colour, 
-                Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)glyph.TextureY / font->GetAtlas()->GetHeight()), 
-                textureIndex,
-                flags 
-            };
-            *m_NextVertex = topLeft;
-            m_NextVertex++;
+            Rectanglef bounds(origin + (glyph.BearingX * scale), position.Y - (glyph.BearingY * scale), glyph.Width * scale, glyph.Height * scale);
+            Rectanglef source((float)glyph.TextureX, (float)glyph.TextureY, glyph.Width, glyph.Height);
 
-            Vertex topRight = 
-            { 
-                Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y - (glyph.BearingY * scale), depth), 
-                colour, 
-                Vector2((float)(glyph.TextureX + glyph.Width) / font->GetAtlas()->GetWidth(), (float)glyph.TextureY / font->GetAtlas()->GetHeight()), 
-                textureIndex,
-                flags 
-            };
-            *m_NextVertex = topRight;
-            m_NextVertex++;
-
-            Vertex bottomRight = 
-            { 
-                Vector3(origin + ((glyph.BearingX + glyph.Width) * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), depth), 
-                colour, 
-                Vector2((float)(glyph.TextureX + glyph.Width) / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
-                textureIndex,
-                flags 
-            };
-            *m_NextVertex = bottomRight;
-            m_NextVertex++;
-
-            Vertex bottomLeft = 
-            { 
-                Vector3(origin + (glyph.BearingX * scale), position.Y + ((-glyph.BearingY + glyph.Height) * scale), depth), 
-                colour, 
-                Vector2((float)glyph.TextureX / font->GetAtlas()->GetWidth(), (float)(glyph.TextureY + glyph.Height) / font->GetAtlas()->GetHeight()), 
-                textureIndex,
-                flags 
-            };
-            *m_NextVertex = bottomLeft;
-            m_NextVertex++;
-
-            m_IndexCount += 6;
+            m_RenderItems.push_back(RenderItem(bounds, source, font->GetAtlas(), colour, depth, 0.0f, flags));
 
             origin += glyph.Advance * scale;
         }
