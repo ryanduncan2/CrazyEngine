@@ -15,6 +15,8 @@ namespace CrazyEngine
 
     public:
 
+        static Vector2 s_Viewport;
+
         Platform m_Platform;
         Clock m_Clock;
         Input m_Input;
@@ -22,7 +24,7 @@ namespace CrazyEngine
 
         Application(const std::uint32_t width, const std::uint32_t height, const char* title);
 
-        virtual void OnResize(const std::uint32_t width, const std::uint32_t height) { };
+        virtual void OnResize(const std::uint32_t width, const std::uint32_t height);
         virtual void OnClose(bool shouldClose);
 
         virtual void Initialise() { };
