@@ -16,8 +16,11 @@ namespace CrazyEngine
 
     public:
 
-        OpenGLTexture(const char* filePath);
-        OpenGLTexture(std::uint32_t width, std::uint32_t height, std::uint8_t* data);
+        static OpenGLTexture* CreateFromFile(const char* filePath, FilterType filter);
+        static OpenGLTexture* CreateFromData(std::uint32_t width, std::uint32_t height, std::uint32_t channelCount, std::uint8_t* data, FilterType filter);
+        static OpenGLTexture* CreateGlyphTexture(std::uint32_t width, std::uint32_t height, std::uint8_t* data, FilterType filter);
+
+        OpenGLTexture(std::uint32_t width, std::uint32_t height, std::uint32_t channelCount);
         ~OpenGLTexture();
 
         inline std::uint32_t GetHandle() const override { return m_Handle; }

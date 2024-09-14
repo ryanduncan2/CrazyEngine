@@ -57,8 +57,8 @@ namespace CrazyEngine
         std::uint8_t* atlasData = new std::uint8_t[atlasWidth * atlasHeight * sizeof(std::uint8_t)];
         file.read((char*)atlasData, atlasWidth * atlasHeight * sizeof(std::uint8_t));
         file.close();
-
-        font->m_GlyphAtlas = Texture::Create(atlasWidth, atlasHeight, atlasData);
+        
+        font->m_GlyphAtlas = Texture::CreateGlyph(atlasWidth, atlasHeight, atlasData, FilterType::LINEAR_MIPMAP_LINEAR);
 
         return font;
     }

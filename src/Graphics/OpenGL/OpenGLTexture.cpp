@@ -8,62 +8,90 @@
 
 namespace CrazyEngine
 {
-    OpenGLTexture::OpenGLTexture(const char* filePath)
+    OpenGLTexture* OpenGLTexture::CreateFromFile(const char* filePath, FilterType filter)
     {
-        std::uint8_t* data = stbi_load(filePath, (int*)&m_Width, (int*)&m_Height, (int*)&m_ChannelCount, 0);
-        
-        // glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-        // glGenTextures(1, &m_Handle);
-        // glBindTexture(GL_TEXTURE_2D, m_Handle);
+        std::uint32_t width;
+        std::uint32_t height;
+        std::uint32_t channelCount;
+        std::uint8_t* data = stbi_load(filePath, (int*)&width, (int*)&height, (int*)&channelCount, 0);
 
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        OpenGLTexture* texture = OpenGLTexture::CreateFromData(width, height, channelCount, data, filter);
 
-        // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        // glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
 
-        // glBindTexture(GL_TEXTURE_2D, 0);
+        return texture;
+    }
+
+    OpenGLTexture* OpenGLTexture::CreateFromData(std::uint32_t width, std::uint32_t height, std::uint32_t channelCount, std::uint8_t* data, FilterType filter)
+    {
+        OpenGLTexture* texture = new OpenGLTexture(width, height, channelCount);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-        glGenTextures(1, &m_Handle);
-        glBindTexture(GL_TEXTURE_2D, m_Handle);
+        glGenTextures(1, &texture->m_Handle);
+        glBindTexture(GL_TEXTURE_2D, texture->m_Handle);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        GLint minFilter;
+        GLint magFilter;
 
-        if (m_ChannelCount == 4)
+        switch (filter)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            case FilterType::LINEAR: minFilter = GL_LINEAR; magFilter = GL_LINEAR; break;
+            case FilterType::NEAREST: minFilter = GL_NEAREST; magFilter = GL_NEAREST; break;
+            case FilterType::NEAREST_MIPMAP_NEAREST: minFilter = GL_NEAREST_MIPMAP_NEAREST; magFilter = GL_NEAREST; break;
+            case FilterType::NEAREST_MIPMAP_LINEAR: minFilter = GL_NEAREST_MIPMAP_LINEAR; magFilter = GL_NEAREST; break;
+            case FilterType::LINEAR_MIPMAP_NEAREST: minFilter = GL_LINEAR_MIPMAP_NEAREST; magFilter = GL_NEAREST; break;
+            case FilterType::LINEAR_MIPMAP_LINEAR: minFilter = GL_LINEAR_MIPMAP_LINEAR; magFilter = GL_LINEAR; break;
+        }
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        if (texture->m_ChannelCount == 4)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->m_Width, texture->m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         }
         else
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, texture->m_Width, texture->m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         }
         
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        stbi_image_free(data);
+        return texture;
     }
 
-    // this one has been altered for fonts/greyscale.
-    OpenGLTexture::OpenGLTexture(std::uint32_t width, std::uint32_t height, std::uint8_t* data) : m_Width(width), m_Height(height)
+    OpenGLTexture* OpenGLTexture::CreateGlyphTexture(std::uint32_t width, std::uint32_t height, std::uint8_t* data, FilterType filter)
     {
+        OpenGLTexture* texture = new OpenGLTexture(width, height, 4);
+
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glGenTextures(1, &m_Handle);
-        glBindTexture(GL_TEXTURE_2D, m_Handle);
+        glGenTextures(1, &texture->m_Handle);
+        glBindTexture(GL_TEXTURE_2D, texture->m_Handle);
 
         GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_RED };
 
         glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == FilterType::NEAREST ? GL_NEAREST : GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter == FilterType::NEAREST ? GL_NEAREST : GL_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_Width, m_Height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, texture->m_Width, texture->m_Height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        return texture;
+    }
+
+    OpenGLTexture::OpenGLTexture(std::uint32_t width, std::uint32_t height, std::uint32_t channelCount)
+        : m_Width(width),
+          m_Height(height),
+          m_ChannelCount(channelCount)
+    {
     }
 
     OpenGLTexture::~OpenGLTexture()
