@@ -6,6 +6,9 @@
 
 #include "CrazyEngine/Math/Vector2.h"
 
+#undef min
+#undef max
+
 namespace CrazyEngine
 {
     template <typename T>
@@ -34,6 +37,7 @@ namespace CrazyEngine
         inline Vector2 GetPosition() const noexcept { return Vector2(X, Y); }
         inline Vector2 GetCentre() const noexcept { return Vector2(X + (Width / 2), Y + (Height / 2)); }
         inline Vector2 GetSize() const noexcept { return Vector2(Width, Height); }
+        inline std::uint32_t GetArea() const noexcept { return Width * Height; }
 
         std::string ToString() const noexcept { return "Rectangle[X: " + std::to_string(X) + ", Y: " + std::to_string(Y) + ", Width: " + std::to_string(Width) + ", Height: " + std::to_string(Height) + "]"; }
 
@@ -47,10 +51,10 @@ namespace CrazyEngine
 
         void operator+=(const Rectangle<T>& rect) noexcept
         {
-            X = min(X, rect.X);
-            Y = min(Y, rect.Y);
-            Width = max(GetRight() - X, rect.GetRight() - X);
-            Height = max(GetBottom() - Y, rect.GetBottom() - Y);
+            X = std::min(X, rect.X);
+            Y = std::min(Y, rect.Y);
+            Width = GetRight() - X > rect.GetRight() - X ? GetRight() - X : rect.GetRight() - X;
+            Height = GetBottom() - Y > rect.GetBottom() - Y ? GetBottom() - Y : rect.GetBottom() - Y;
         }
     };
 
@@ -68,12 +72,12 @@ std::ostream& operator<<(std::ostream& os, const CrazyEngine::Rectangle<T>& rect
 template<class T>
 CrazyEngine::Rectangle<T> operator+(CrazyEngine::Rectangle<T>& firstRect, CrazyEngine::Rectangle<T>& secondRect) noexcept
 {
-    float X = min(firstRect.X, secondRect.X);
-    float Y = min(firstRect.Y, secondRect.Y);
+    T X = std::min(firstRect.X, secondRect.X);
+    T Y = std::min(firstRect.Y, secondRect.Y);
 
-    CrazyEngine::Rectangle<T> rect = (X, Y, 
-                                    max(firstRect.GetRight() - X, secondRect.GetRight() - X), 
-                                    max(firstRect.GetBottom() - Y, secondRect.GetBottom() - Y));
+    CrazyEngine::Rectangle<T> rect(X, Y, 
+    firstRect.GetRight() - X > secondRect.GetRight() - X ? firstRect.GetRight() - X : secondRect.GetRight() - X, 
+    firstRect.GetBottom() - Y > secondRect.GetBottom() - Y ? firstRect.GetBottom() - Y : secondRect.GetBottom() - Y);
 
     return rect;
 }
