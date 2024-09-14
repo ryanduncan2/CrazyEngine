@@ -8,6 +8,8 @@
 
 namespace CrazyEngine
 {
+    Vector2 Application::s_Viewport = Vector2(0.0f, 0.0f);
+
     Application::Application(const std::uint32_t width, const std::uint32_t height, const char* title) : m_Platform(title, 40, 40, width, height)
     {
         m_Input.Initialise();
@@ -20,6 +22,14 @@ namespace CrazyEngine
         callbacks.WindowResizeCallback = std::bind(&Application::OnResize, this, std::placeholders::_1, std::placeholders::_2);
         callbacks.WindowCloseCallback = std::bind(&Application::OnClose, this, std::placeholders::_1);
         m_Platform.SetCallbacks(callbacks);
+        s_Viewport.X = width;
+        s_Viewport.Y = height;
+    }
+
+    void Application::OnResize(const std::uint32_t width, const std::uint32_t height)
+    {
+        s_Viewport.X = width;
+        s_Viewport.Y = height;
     }
 
     void Application::OnClose(bool shouldClose)
@@ -27,6 +37,7 @@ namespace CrazyEngine
         m_ShouldClose = shouldClose;
     }
 
+    // TODO: add accumulator system for fixed-time game loop
     void Application::Run()
     {
         Initialise();
@@ -34,10 +45,8 @@ namespace CrazyEngine
         while (!m_ShouldClose)
         {
             m_Input.Update();
-
             m_Platform.PumpMessages();
             m_Clock.Update(m_Platform);
-            
             m_Audio.Update(m_Clock);
 
             Update();

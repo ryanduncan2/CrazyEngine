@@ -29,12 +29,14 @@ namespace CrazyEngine
         RendererAPI::SetAPI(GraphicsAPI::OPENGL);
         m_API = RendererAPI::Create();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         // Local Buffer Creation
 
         m_VertexData = new Vertex[MAX_QUADS * 4];
+
+        // Creating 1x1 White Texture
+
+        std::uint32_t data = 0xffffffff;
+        m_TextureSlots[0] = Texture::Create(1, 1, (std::uint8_t*)&data);
 
         // Buffer Creation
 
@@ -82,6 +84,7 @@ namespace CrazyEngine
         delete m_VertexBuffer;
         delete m_IndexBuffer;
         delete[] m_VertexData;
+        delete m_TextureSlots[0];
     }
 
     void Renderer2D::Resize(const std::uint32_t width, const std::uint32_t height)
@@ -116,7 +119,7 @@ namespace CrazyEngine
         
         std::uint32_t itemCount = 0;
         std::uint32_t indexCount = 0;
-        std::uint32_t nextTextureIndex = 0;
+        std::uint32_t nextTextureIndex = 1;
 
         for (std::size_t i = 0; i < m_RenderItems.size(); ++i)
         {
@@ -138,7 +141,7 @@ namespace CrazyEngine
                 indexCount = 0;
                 itemCount = 0;
                 nextVertex = m_VertexData;
-                nextTextureIndex = 0;
+                nextTextureIndex = 1;
             }
 
             RenderItem item = m_RenderItems[i];
@@ -175,7 +178,7 @@ namespace CrazyEngine
                     indexCount = 0;
                     itemCount = 0;
                     nextVertex = m_VertexData;
-                    nextTextureIndex = 0;
+                    nextTextureIndex = 1;
 
                     i--;
                     continue;
@@ -214,30 +217,35 @@ namespace CrazyEngine
         m_RenderItems.clear();
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, float depth, int flags)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Vector4& colour, float depth, int flags)
+    {
+        Draw(bounds, m_TextureSlots[0], colour, depth, flags);
+    }
+
+    void Renderer2D::Draw(const Rectanglef& bounds, Texture* texture, const Vector4& colour, float depth, int flags)
     {
         Rectanglef source(0, 0, texture->GetWidth(), texture->GetHeight());
-        Draw(bounds, source, texture, depth, flags);
+        Draw(bounds, source, texture, colour, depth, flags);
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float depth, int flags)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, const Vector4& colour, float depth, int flags)
     {
         if (m_RenderItems.size() >= MAX_QUADS)
         {
             Flush();
         }
 
-        m_RenderItems.push_back(RenderItem(bounds, source, texture, Vector4(1.0f, 1.0f, 1.0f, 1.0f), depth, 0.0f, flags));
+        m_RenderItems.push_back(RenderItem(bounds, source, texture, colour, depth, 0.0f, flags));
     }
 
-    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, float rotation, float depth, int flags)
+    void Renderer2D::Draw(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, const Vector4& colour, float rotation, float depth, int flags)
     {
         if (m_RenderItems.size() >= MAX_QUADS)
         {
             Flush();
         }
 
-        m_RenderItems.push_back(RenderItem(bounds, source, texture, Vector4(1.0f, 1.0f, 1.0f, 1.0f), depth, rotation, flags));
+        m_RenderItems.push_back(RenderItem(bounds, source, texture, colour, depth, rotation, flags));
     }
 
     void Renderer2D::DrawString(const std::string& str, const Vector2& position, const Vector4& colour, TextureFont* font, float scale, float depth, int flags)
