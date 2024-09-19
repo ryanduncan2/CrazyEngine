@@ -6,6 +6,10 @@ namespace CrazyEngine
     {
     }
 
+    BufferLayout::~BufferLayout()
+    {
+    }
+
     void BufferLayout::AddElement(ShaderDataType type)
     {
         m_Elements.push_back(BufferElement(type, m_Size));

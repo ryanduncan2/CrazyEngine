@@ -2,15 +2,11 @@
 
 namespace CrazyEngine
 {
-    // Key
-
     Key& operator++(Key& key)
     {
         key = static_cast<Key>(key + 1);
         return key;
     }
-
-    // Input
 
     Input::Input()
     {
@@ -60,8 +56,6 @@ namespace CrazyEngine
         m_MouseWheelDelta = delta;
     }
 
-    // Keyboard Querying Functions
-
     bool Input::IsKeyDown(Key key)
     {
         return m_CurrentKeyboardState[key] == true;
@@ -92,8 +86,6 @@ namespace CrazyEngine
         return m_PreviousKeyboardState[key] == true && m_CurrentKeyboardState[key] == false;
     }
 
-    // Mouse Querying Functions
-
     bool Input::IsMouseButtonDown(MouseButton button)
     {
         return m_CurrentMouseButtonsState[button] == true;
@@ -116,10 +108,6 @@ namespace CrazyEngine
 
     bool Input::IsMouseButtonPressed(MouseButton button)
     {
-        // std::cout << "Querying Mouse Pressed: " << std::endl;
-        // std::cout << " - Previous State: " << m_PreviousMouseButtonsState[button] << std::endl;
-        // std::cout << " - Current State: " << m_CurrentMouseButtonsState[button] << std::endl;
-
         return m_PreviousMouseButtonsState[button] == false && m_CurrentMouseButtonsState[button] == true;
     }
 

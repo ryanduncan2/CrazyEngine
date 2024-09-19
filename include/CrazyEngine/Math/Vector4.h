@@ -13,6 +13,7 @@ namespace CrazyEngine
     class Vector4
     {
     public:
+    
         float X;
         float Y;
         float Z;

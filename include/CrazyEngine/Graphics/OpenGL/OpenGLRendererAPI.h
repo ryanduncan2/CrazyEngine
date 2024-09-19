@@ -8,7 +8,8 @@ namespace CrazyEngine
     class OpenGLRendererAPI : public RendererAPI
     {
     public:
-        OpenGLRendererAPI() { }
+
+        OpenGLRendererAPI();
 
         void Initialise() override;
         void Terminate() override;

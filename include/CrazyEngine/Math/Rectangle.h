@@ -21,6 +21,7 @@ namespace CrazyEngine
                   std::is_same<std::int64_t, T>());
 
     public:
+    
         T X;
         T Y;
         T Width;

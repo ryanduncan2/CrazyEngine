@@ -5,6 +5,14 @@
 
 namespace CrazyEngine
 {
+    IndexBuffer::IndexBuffer()
+    {
+    }
+
+    IndexBuffer::~IndexBuffer()
+    {
+    }
+
     IndexBuffer* IndexBuffer::Create(std::uint32_t* indices, std::uint32_t count)
     {
         switch (RendererAPI::GetAPI())
@@ -16,6 +24,14 @@ namespace CrazyEngine
         }
 
         return nullptr;
+    }
+
+    VertexBuffer::VertexBuffer()
+    {
+    }
+
+    VertexBuffer::~VertexBuffer()
+    {
     }
 
     VertexBuffer* VertexBuffer::Create(std::uint32_t size)

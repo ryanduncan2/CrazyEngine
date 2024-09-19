@@ -41,6 +41,7 @@ namespace CrazyEngine
         Vector2 m_Viewport;
 
     public:
+    
         Renderer2D();
         ~Renderer2D();
 

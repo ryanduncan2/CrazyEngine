@@ -8,8 +8,11 @@ namespace CrazyEngine
     class VertexArray
     {
     public:
-        VertexArray() { }
-        ~VertexArray() { }
+    
+        static VertexArray* Create();
+    
+        VertexArray();
+        ~VertexArray();
 
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
@@ -19,8 +22,6 @@ namespace CrazyEngine
 
         virtual VertexBuffer* GetVertexBuffer() const noexcept = 0;
         virtual IndexBuffer* GetIndexBuffer() const noexcept = 0;
-
-        static VertexArray* Create();
     };
 }
 

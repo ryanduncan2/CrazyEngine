@@ -6,6 +6,14 @@ namespace CrazyEngine
 {
     GraphicsAPI RendererAPI::s_API = GraphicsAPI::NONE;
 
+    RendererAPI::RendererAPI()
+    {
+    }
+
+    RendererAPI::~RendererAPI()
+    {
+    }
+
     RendererAPI* RendererAPI::Create()
     {
         switch (s_API)

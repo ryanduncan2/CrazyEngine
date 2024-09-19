@@ -17,4 +17,12 @@ namespace CrazyEngine
 
         return nullptr;
     }
+
+    VertexArray::VertexArray()
+    {
+    }
+
+    VertexArray::~VertexArray()
+    {
+    }
 }

@@ -21,8 +21,6 @@ namespace CrazyEngine
     {
     private:
         
-        double playbackTime = 0.0;
-
         IMMDevice* m_Renderer;
         IMMDevice* m_Recorder;
 

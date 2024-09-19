@@ -14,8 +14,8 @@ namespace CrazyEngine
     {
     public:
 
-        IndexBuffer() { }
-        ~IndexBuffer() { }
+        IndexBuffer();
+        ~IndexBuffer();
 
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
@@ -29,8 +29,8 @@ namespace CrazyEngine
     {
     public:
 
-        VertexBuffer() { }
-        ~VertexBuffer() { }
+        VertexBuffer();
+        ~VertexBuffer();
 
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;

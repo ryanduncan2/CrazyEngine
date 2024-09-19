@@ -20,8 +20,8 @@ namespace CrazyEngine
 
     public:
 
-        RendererAPI() { }
-        ~RendererAPI() { }
+        RendererAPI();
+        ~RendererAPI();
 
         virtual void Initialise() = 0;
         virtual void Terminate() = 0;

@@ -43,4 +43,12 @@ namespace CrazyEngine
 
         return nullptr;
     }
+
+    Texture::Texture()
+    {
+    }
+
+    Texture::~Texture()
+    {
+    }
 }

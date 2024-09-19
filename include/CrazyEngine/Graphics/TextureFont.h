@@ -30,7 +30,8 @@ namespace CrazyEngine
         std::vector<Glyph> m_Glyphs;
 
     public:
-        TextureFont() { }
+
+        TextureFont();
         ~TextureFont();
 
         static TextureFont* Load(const char* filePath);

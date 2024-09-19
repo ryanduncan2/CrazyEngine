@@ -50,6 +50,7 @@ namespace CrazyEngine
     public:
     
         BufferLayout();
+        ~BufferLayout();
 
         void AddElement(ShaderDataType type);
         inline std::vector<BufferElement>& GetElements() { return m_Elements; }

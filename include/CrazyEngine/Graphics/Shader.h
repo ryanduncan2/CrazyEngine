@@ -8,8 +8,12 @@ namespace CrazyEngine
     class Shader
     {
     public:
-        Shader() { }
-        ~Shader() { }
+
+        static Shader* Create(const char* vertexFilePath, const char* fragmentFilePath);
+        static Shader* Create(const char* vertexFilePath, const char* fragmentFilePath, int textureSlots);
+
+        Shader();
+        ~Shader();
 
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
@@ -23,9 +27,6 @@ namespace CrazyEngine
         virtual void SetFloat2Array(const char* name, const int count, CrazyEngine::Vector2* value) = 0;
         virtual void SetFloat3Array(const char* name, const int count, CrazyEngine::Vector3* value) = 0;
         virtual void SetMatrix4(const char* name, const Matrix4& matrix) = 0;
-
-        static Shader* Create(const char* vertexFilePath, const char* fragmentFilePath);
-        static Shader* Create(const char* vertexFilePath, const char* fragmentFilePath, int textureSlots);
     };
 }
 

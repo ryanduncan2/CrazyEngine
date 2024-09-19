@@ -23,9 +23,11 @@ namespace CrazyEngine
     class Platform
     {
     private:
+
         void* m_InternalState;
 
     public:
+    
         Platform(const char* appTitle, std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height);
         inline ~Platform() { }
 

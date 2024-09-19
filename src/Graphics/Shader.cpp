@@ -30,4 +30,12 @@ namespace CrazyEngine
 
         return nullptr;
     }
+
+    Shader::Shader()
+    {
+    }
+
+    Shader::~Shader()
+    {
+    }
 }

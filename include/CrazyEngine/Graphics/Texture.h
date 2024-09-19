@@ -14,8 +14,12 @@ namespace CrazyEngine
     {
     public:
 
-        Texture() { }
-        ~Texture() { }
+        static Texture* CreateFromFile(const char* filePath, FilterType filter = FilterType::NEAREST);
+        static Texture* Create(std::uint32_t width, std::uint32_t height, std::uint8_t* data, FilterType filter = FilterType::NEAREST);
+        static Texture* CreateGlyph(std::uint32_t width, std::uint32_t height, std::uint8_t* data, FilterType filter = FilterType::NEAREST);
+
+        Texture();
+        ~Texture();
 
         virtual std::uint32_t GetWidth() const = 0;
         virtual std::uint32_t GetHeight() const = 0;
@@ -26,10 +30,6 @@ namespace CrazyEngine
 
         virtual bool operator==(const Texture& texture) const = 0;
         virtual bool operator!=(const Texture& texture) const = 0;
-
-        static Texture* CreateFromFile(const char* filePath, FilterType filter = FilterType::NEAREST);
-        static Texture* Create(std::uint32_t width, std::uint32_t height, std::uint8_t* data, FilterType filter = FilterType::NEAREST);
-        static Texture* CreateGlyph(std::uint32_t width, std::uint32_t height, std::uint8_t* data, FilterType filter = FilterType::NEAREST);
     };
 }
 

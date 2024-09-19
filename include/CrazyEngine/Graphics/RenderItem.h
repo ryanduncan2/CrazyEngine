@@ -10,6 +10,7 @@ namespace CrazyEngine
     class RenderItem
     {
     private:
+
         Rectanglef m_Bounds;
         Rectanglef m_Source;
         Texture* m_Texture;
@@ -19,6 +20,7 @@ namespace CrazyEngine
         int m_Flags;
 
     public:
+    
         RenderItem(const Rectanglef& bounds, const Rectanglef& source, Texture* texture, Vector4 colour, float depth, float rotation, int flags);
         ~RenderItem();
 

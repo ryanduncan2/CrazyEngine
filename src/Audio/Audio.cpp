@@ -12,8 +12,6 @@
 
 namespace CrazyEngine
 {
-    
-
     Audio::Audio() :
         m_Recorder(nullptr),
         m_Renderer(nullptr),
@@ -21,8 +19,7 @@ namespace CrazyEngine
         m_RenderClient(nullptr),
         m_RenderService(nullptr),
         m_CaptureService(nullptr),
-        m_CaptureFormat(nullptr),
-        playbackTime(0)
+        m_CaptureFormat(nullptr)
     {
         HRESULT hr;
         IMMDeviceEnumerator* enumerator = nullptr;

@@ -63,6 +63,11 @@ namespace CrazyEngine
         return font;
     }
 
+    TextureFont::TextureFont()
+    {
+
+    }
+
     TextureFont::~TextureFont()
     {
         delete m_GlyphAtlas;

@@ -6,6 +6,10 @@
 
 namespace CrazyEngine
 {
+    OpenGLRendererAPI::OpenGLRendererAPI()
+    {
+    }
+
     void OpenGLRendererAPI::Initialise()
     {
         glEnable(GL_BLEND);
