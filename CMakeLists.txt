@@ -17,6 +17,7 @@ set(SRC_FILES
     src/Platform/PlatformWin32.cpp
 
     src/Audio/Audio.cpp
+    src/Audio/Sound.cpp
 
     src/Graphics/Shader.cpp
     src/Graphics/Renderer2D.cpp
