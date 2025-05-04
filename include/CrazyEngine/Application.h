@@ -1,6 +1,8 @@
 #ifndef CRAZY_ENGINE_APPLICATION_H_
 #define CRAZY_ENGINE_APPLICATION_H_
 
+#define testsss
+
 #include "CrazyEngine/Platform/Platform.h"
 #include "CrazyEngine/Core/Clock.h"
 #include "CrazyEngine/Audio/Audio.h"
